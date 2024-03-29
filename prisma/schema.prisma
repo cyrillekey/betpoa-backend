@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int         @id @default(autoincrement())
+  phone     String      @unique
+  password  String
+  role      UserRole    @default(CUSTOMER)
+  phoneValidated Boolean @default(false)
+  profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId Int         @unique
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("user")
+}
+
+model UserProfile {
+  id        Int         @id @default(autoincrement())
+  fname     String?
+  lname     String?
+  email     String?
+  user      User?       @relation()
+  avatar    Attachment? @relation(fields: [avatarId], references: [id], onDelete: Cascade)
+  avatarId  Int?        @unique
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("userprofile")
+}
+
+model Attachment {
+  id          Int          @id @default(autoincrement())
+  link        String
+  filename    String
+  fileType    String
+  userProfile UserProfile?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("attachment")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+}

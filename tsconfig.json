@@ -1,0 +1,11 @@
+{
+  "extends": "fastify-tsconfig",
+  "compilerOptions": {
+    "outDir": "dist",
+    "sourceMap": true,
+    "paths":{
+      "@controllers/*": ["./src/controllers/*"]
+    }
+  },
+  "include": ["src/**/*.ts"]
+}
