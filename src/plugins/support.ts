@@ -6,9 +6,10 @@ interface IFormatCurreny {
   currency: 'CAD' | 'KSH' | 'USD'
   amount: number
 }
+type UserJwt = Omit<User, 'password' | 'createdAt' | 'updatedAt'>
 interface IJWTToken {
-  sign: (options: User) => string
-  verify: (token: string) => User | null
+  sign: (options: UserJwt) => string
+  verify: (token: string) => UserJwt | null
 }
 export interface SupportPluginOptions {
   formatPhoneNumber(phone: string): string
@@ -21,7 +22,7 @@ export const token = {
   /**
    * Use JWT to sign a token
    */
-  sign: (options: User) => {
+  sign: (options: UserJwt) => {
     if (!options?.id || !options?.role) {
       throw new Error('Expects email, account type and id in payload.')
     }
@@ -31,9 +32,9 @@ export const token = {
   /**
    * Verify token, and get passed in variables
    */
-  verify: (tokenValue: string): User | null => {
+  verify: (tokenValue: string): UserJwt | null => {
     try {
-      return jwt.verify(tokenValue, configs.jwtsecret) as User
+      return jwt.verify(tokenValue, configs.jwtsecret) as UserJwt
     } catch (error) {
       return null
     }

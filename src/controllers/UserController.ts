@@ -1,4 +1,4 @@
-import { genSaltSync, hash } from 'bcrypt'
+import { compare, genSaltSync, hash } from 'bcrypt'
 
 import { ISignInBody, ISignUpBody } from './interface/user'
 import { BaseController } from './BaseController'
@@ -66,6 +66,28 @@ export class UserController extends BaseController {
           message: 'Failed! Invalid credentials provided',
         })
       }
+      const password = await compare(body.password, user.password)
+      if (!password) {
+        return this.res.status(403).send({
+          id: null,
+          success: false,
+          message: 'Failed! Invalid credentials provided',
+        })
+      }
+      const jwtUser = {
+        id: user?.id,
+        phone: user?.phone,
+        phoneValidated: user?.phoneValidated,
+        profileId: user?.profileId,
+        role: user?.role,
+      }
+      const token = this.app.helpers.jwt.sign(jwtUser)
+      return this.res.status(200).send({
+        id: user?.id,
+        sucess: true,
+        token: token,
+        user: jwtUser,
+      })
     } catch (error) {
       return this.res.status(500).send({
         id: null,
