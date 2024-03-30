@@ -1,7 +1,7 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify"
+import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 
 export abstract class BaseController {
-    /**
+  /**
    * Fastify application instance
    *
    * @protected

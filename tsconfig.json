@@ -4,7 +4,9 @@
     "outDir": "dist",
     "sourceMap": true,
     "paths":{
-      "@controllers/*": ["./src/controllers/*"]
+      "@controllers/*": ["./src/controllers/*"],
+      "@hooks/*":["./src/hooks/*"],
+      "@configs/*":["./src/configs/*"]
     }
   },
   "include": ["src/**/*.ts"]

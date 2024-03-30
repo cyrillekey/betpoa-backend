@@ -1,22 +1,17 @@
-import 'module-alias/register';
-import { join } from 'path';
-import AutoLoad, {AutoloadPluginOptions} from '@fastify/autoload';
-import { FastifyPluginAsync, FastifyServerOptions } from 'fastify';
+import 'module-alias/register'
+
+import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
+import { join } from 'path'
 
-export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {
-
-}
+export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
 // Pass --options via CLI arguments in command to enable these options.
-const options: AppOptions = {
-}
+const options: AppOptions = {}
 
-const app: FastifyPluginAsync<AppOptions> = async (
-    fastify,
-    opts
-): Promise<void> => {
+const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void> => {
   // Place here your custom code!
-    fastify.withTypeProvider<TypeBoxTypeProvider>()
+  fastify.withTypeProvider<TypeBoxTypeProvider>()
   // Do not touch the following lines
 
   // This loads all plugins defined in plugins
@@ -24,17 +19,16 @@ const app: FastifyPluginAsync<AppOptions> = async (
   // through your application
   void fastify.register(AutoLoad, {
     dir: join(__dirname, 'plugins'),
-    options: opts
+    options: opts,
   })
 
   // This loads all plugins defined in routes
   // define your routes in one of these
   void fastify.register(AutoLoad, {
     dir: join(__dirname, 'routes'),
-    options: opts
+    options: opts,
   })
+}
 
-};
-
-export default app;
+export default app
 export { app, options }
