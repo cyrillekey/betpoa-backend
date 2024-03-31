@@ -96,4 +96,11 @@ export class UserController extends BaseController {
       })
     }
   }
+  async requestPhoneOtp() {
+    try {
+      //
+    } catch (error) {
+      this.app.Sentry.captureException(error)
+    }
+  }
 }
