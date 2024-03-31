@@ -14,15 +14,16 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  phone     String      @unique
-  password  String
-  role      UserRole    @default(CUSTOMER)
-  phoneValidated Boolean @default(false)
-  profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  profileId Int         @unique
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id             Int         @id @default(autoincrement())
+  phone          String      @unique
+  password       String
+  role           UserRole    @default(CUSTOMER)
+  phoneValidated Boolean     @default(false)
+  profile        UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId      Int         @unique
+  bets           Bet[]       @relation()
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   @@map("user")
 }
@@ -53,7 +54,154 @@ model Attachment {
   @@map("attachment")
 }
 
+model Bet {
+  id           Int             @id @default(autoincrement())
+  date         DateTime
+  markets      BetMarketOdds[] @relation()
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       Int
+  amountPlaced Float           @default(1.0)
+  totalMarkets Int             @default(1)
+  totalOdds    Float           @default(1.0)
+  possibleWin  Float           @default(0.0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@map("bet")
+}
+
+model BetMarketOdds {
+  id        Int      @id @default(autoincrement())
+  pick      String
+  odd       Odds     @relation(fields: [oddId], references: [id], onDelete: Cascade)
+  oddId     Int
+  bet       Bet      @relation(fields: [betId], references: [id], onDelete: Cascade)
+  betId     Int
+  betOdd    Float    @default(1.0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("betmarketodds")
+}
+
+model League {
+  id        Int       @id @default(autoincrement())
+  leagueId  Int
+  name      String
+  logo      String
+  type      String
+  country   String
+  season    String
+  fixtures  Fixture[] @relation()
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("league")
+}
+
+model Team {
+  id           Int       @id @default(autoincrement())
+  teamId       Int       @unique
+  name         String
+  code         String
+  logo         String
+  venue        String
+  homeFixtures Fixture[] @relation(name: "HomeFixtures")
+  awayFixtures Fixture[] @relation(name: "AwayFixtures")
+  createdAt    DateTime  @default(now())
+  updatedAT    DateTime  @updatedAt
+
+  @@map("team")
+}
+
+model Fixture {
+  id            Int            @id @default(autoincrement())
+  fixtureId     Int
+  date          DateTime
+  referee       String
+  status        MATCHSTATUS
+  league        League         @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  leagueId      Int
+  homeTeam      Team           @relation(name: "HomeFixtures", fields: [homeTeamId], references: [id], onDelete: Cascade)
+  homeTeamId    Int
+  awayTeam      Team           @relation(name: "AwayFixtures", fields: [awayTeamId], references: [id], onDelete: Cascade)
+  awayTeamId    Int
+  fixtureResult FIXTURERESULT  @default(NP)
+  result        FixtureResult? @relation()
+  odds          Odds?          @relation()
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([leagueId])
+  @@map("fixture")
+}
+
+model FixtureResult {
+  id             Int     @id @default(autoincrement())
+  homeGoals      Int?
+  awayGoals      Int?
+  htHomeGoals    Int?
+  htAwayGoals    Int?
+  extraHomeGoals Int?
+  awayHomeGoals  Int?
+  fixture        Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  fixtureId      Int     @unique
+
+  @@map("fixtureresults")
+}
+
+model Odds {
+  id        Int             @id @default(autoincrement())
+  name      String
+  value     Float
+  odd       Float           @default(1.0)
+  type      OddType
+  fixture   Fixture         @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  fixtureId Int             @unique
+  betSlips  BetMarketOdds[] @relation()
+  createdAt DateTime
+  updatedAt DateTime
+
+  @@map("odds")
+}
+
+enum OddType {
+  WINNER_FT
+  WINNER_HT
+  OVER_UNDER_HT
+  OVER_UNDER_FT
+  HALTIME_HOME_WIN
+  HALFTIME_AWAY_WIN
+  DOUBLE_HOME_DRAW
+  DOUBLE_HOME_AWAY
+  DOUBLE_AWAY_DRAW
+  DOUBLE_CHANCE
+  HALFTIME_FULLTIME
+  EXACT_SCORE_FT
+  EXACT_SCORE_HT
+  HOME_ODD_EVEN
+  AWAY_ODD_EVEN
+  FT_ODD_EVEN
+  HALF_ODD_EVEN
+  FIRST_TO_SCORE
+}
+
 enum UserRole {
   CUSTOMER
   ADMIN
+}
+
+enum MATCHSTATUS {
+  FINISHED
+  UPCOMMING
+  ABANDONED
+  INPLAY
+  CANCELLED
+}
+
+enum FIXTURERESULT {
+  HOME
+  AWAY
+  DRAW
+  NP // NOT PLAYED
 }
