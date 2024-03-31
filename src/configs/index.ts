@@ -7,6 +7,8 @@ export interface IConfig {
   apiurl: string
   uiurl: string
   jwtsecret: string
+  rapidApiKey: string
+  rapidApiHost: string
   email: {
     host: string
     port: number
@@ -53,4 +55,6 @@ export const configs: IConfig = {
   stkCallbackUrl: `${process.env.STK_ROOT_DOMAIN}/api/stk-callback`,
   defaultUserPassword: process.env.DEFAULT_USER_PASSOWRD!,
   env,
+  rapidApiHost: process.env.XRapidAPIHost!,
+  rapidApiKey: process.env.XRapidAPIKey!,
 }
