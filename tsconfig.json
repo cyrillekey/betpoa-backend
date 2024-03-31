@@ -6,7 +6,8 @@
     "paths":{
       "@controllers/*": ["./src/controllers/*"],
       "@hooks/*":["./src/hooks/*"],
-      "@configs/*":["./src/configs/*"]
+      "@configs/*":["./src/configs/*"],
+      "@rapidapi/*":["./src/rapidapi/*"]
     }
   },
   "include": ["src/**/*.ts"]

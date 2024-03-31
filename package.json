@@ -9,7 +9,9 @@
   "_moduleAliases": {
     "@controllers": "dist/controllers",
     "@hooks": "dist/hooks",
-    "@configs": "dist/configs"
+    "@configs": "dist/configs",
+    "@rapidapi": "dist/rapidapi",
+    "@cronjobs": "dist/cronjobs"
   },
   "scripts": {
     "test": "npm run build:ts && tsc -p test/tsconfig.json && c8 node --test -r ts-node/register test/**/*.ts",
@@ -26,7 +28,9 @@
     "@fastify/autoload": "^5.0.0",
     "@fastify/sensible": "^5.0.0",
     "@fastify/type-provider-typebox": "^4.0.0",
+    "@immobiliarelabs/fastify-sentry": "^8.0.1",
     "@prisma/client": "5.11.0",
+    "@sentry/profiling-node": "^7.109.0",
     "@sinclair/typebox": "^0.32.20",
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.6",
@@ -34,6 +38,8 @@
     "@typescript-eslint/parser": "^7.4.0",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
+    "cron": "^3.1.6",
+    "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-plugin-import": "^2.29.1",
