@@ -86,7 +86,7 @@ model BetMarketOdds {
 
 model League {
   id        Int       @id @default(autoincrement())
-  leagueId  Int
+  leagueId  Int       @unique
   name      String
   logo      String
   type      String
@@ -116,7 +116,7 @@ model Team {
 
 model Fixture {
   id            Int            @id @default(autoincrement())
-  fixtureId     Int
+  fixtureId     Int            @unique
   date          DateTime
   referee       String
   status        MATCHSTATUS
@@ -144,7 +144,7 @@ model FixtureResult {
   htHomeGoals    Int?
   htAwayGoals    Int?
   extraHomeGoals Int?
-  awayHomeGoals  Int?
+  extraAwayGoals  Int?
   fixture        Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
   fixtureId      Int     @unique
 

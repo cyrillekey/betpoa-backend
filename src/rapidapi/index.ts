@@ -27,8 +27,7 @@ export const getLeagues = async (): Promise<ILeague[]> => {
     return []
   }
 }
-
-export async function getFixtures(leagueId: string[]): Promise<IFixture[]> {
+export async function getUpcomingFixtures(date: Date): Promise<IFixture[]> {
   try {
     const config: AxiosRequestConfig = {
       method: 'GET',
@@ -38,7 +37,28 @@ export async function getFixtures(leagueId: string[]): Promise<IFixture[]> {
         'X-RapidAPI-Host': configs.rapidApiHost,
       },
       params: {
-        ids: leagueId.join('-'),
+        date: dayjs(date).format('YYYY-MM-DD'),
+      },
+    }
+    const response = await axios(config)
+      .then((resp) => resp?.data?.response)
+      .catch(() => [])
+    return response
+  } catch (error) {
+    return []
+  }
+}
+export async function getFixtures(fixturesId: string[]): Promise<IFixture[]> {
+  try {
+    const config: AxiosRequestConfig = {
+      method: 'GET',
+      url: 'https://api-football-v1.p.rapidapi.com/v3/fixtures',
+      headers: {
+        'X-RapidAPI-Key': configs.rapidApiKey,
+        'X-RapidAPI-Host': configs.rapidApiHost,
+      },
+      params: {
+        ids: fixturesId.join('-'),
       },
     }
     const response = await axios(config)

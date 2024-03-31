@@ -7,7 +7,8 @@
       "@controllers/*": ["./src/controllers/*"],
       "@hooks/*":["./src/hooks/*"],
       "@configs/*":["./src/configs/*"],
-      "@rapidapi/*":["./src/rapidapi/*"]
+      "@rapidapi/*":["./src/rapidapi/*"],
+      "@cronjobs/*":["./src/cronjobs/*"]
     }
   },
   "include": ["src/**/*.ts"]

@@ -228,10 +228,14 @@ export interface Tackles {
 }
 
 export interface Score {
-  halftime: TeamsClass
-  fulltime: TeamsClass
-  extratime: TeamsClass
-  penalty: TeamsClass
+  halftime: ScoreClass
+  fulltime: ScoreClass
+  extratime: ScoreClass
+  penalty: ScoreClass
+}
+export interface ScoreClass {
+  home: number | null
+  away: number | null
 }
 
 export interface IFixtureStatistic {
