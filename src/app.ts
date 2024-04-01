@@ -50,7 +50,7 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
     },
   })
   fastify.register(scalarDocumentation, {
-    routePrefix: '/reference',
+    routePrefix: '/api/documentation',
     configuration: {
       spec: {
         content: () => fastify.swagger(),
