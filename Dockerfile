@@ -3,12 +3,10 @@ FROM node:20-alpine as base
 WORKDIR /app
 COPY package.json ./
 FROM base as build
-# RUN yarn --frozen-lockfile
-RUN yarn install
+RUN yarn --frozen-lockfile
 COPY . .
 RUN yarn generate && yarn build:ts
-# RUN yarn --production --frozen-lockfile
-RUN yarn install --production
+RUN yarn --production --frozen-lockfile
 FROM base as release
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
