@@ -10,6 +10,8 @@ import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
 import { join } from 'path'
 
+import { configs } from './configs'
+
 export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
 // Pass --options via CLI arguments in command to enable these options.
 const options: AppOptions = {}
@@ -35,8 +37,8 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
       },
       servers: [
         {
-          url: 'http://localhost:5000',
-          description: 'Development server',
+          url: configs.apiurl,
+          description: 'Production server',
         },
       ],
       components: {

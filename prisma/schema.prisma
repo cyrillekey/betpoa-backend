@@ -19,9 +19,11 @@ model User {
   password       String
   role           UserRole    @default(CUSTOMER)
   phoneValidated Boolean     @default(false)
+  accountBalance Float       @default(0.0)
   profile        UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId      Int         @unique
   bets           Bet[]       @relation()
+  resetTokens    OtpToken[]  @relation()
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
@@ -40,6 +42,18 @@ model UserProfile {
   updatedAt DateTime    @updatedAt
 
   @@map("userprofile")
+}
+
+model OtpToken {
+  id         Int      @id @default(autoincrement())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     Int
+  token      String
+  expiryDate DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("opttoken")
 }
 
 model Attachment {
@@ -144,7 +158,7 @@ model FixtureResult {
   htHomeGoals    Int?
   htAwayGoals    Int?
   extraHomeGoals Int?
-  extraAwayGoals  Int?
+  extraAwayGoals Int?
   fixture        Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
   fixtureId      Int     @unique
 

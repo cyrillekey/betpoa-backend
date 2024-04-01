@@ -6,7 +6,7 @@ interface IFormatCurreny {
   currency: 'CAD' | 'KSH' | 'USD'
   amount: number
 }
-export type UserJwt = Omit<User, 'password' | 'createdAt' | 'updatedAt'>
+export type UserJwt = Omit<User, 'password' | 'createdAt' | 'updatedAt' | 'accountBalance'>
 interface IJWTToken {
   sign: (options: UserJwt) => string
   verify: (token: string) => UserJwt | null
