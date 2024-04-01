@@ -20,12 +20,23 @@ export interface IConfig {
 
   stkCallbackUrl: string
   defaultUserPassword: string
-
+  afrikasTalking: {
+    apiKey: string
+    senderId: string
+    username: string
+  }
+  smsLeopard: {
+    name: string
+    apiKey: string
+    apiSecret: string
+    accessToken: string
+  }
   env: {
     production: boolean
     staging: boolean
     development: boolean
   }
+  smsPlatform: 'smsleopard' | 'africastalking'
 }
 
 const env = {
@@ -57,4 +68,16 @@ export const configs: IConfig = {
   env,
   rapidApiHost: process.env.XRapidAPIHost!,
   rapidApiKey: process.env.XRapidAPIKey!,
+  afrikasTalking: {
+    apiKey: process.env.AFRICAS_TALKING_API_KEY!,
+    senderId: '',
+    username: 'betpoabackned',
+  },
+  smsLeopard: {
+    accessToken: process.env.LEOPARD_ACCESS_TOKEN!,
+    apiKey: process.env.LEOPARD_API_KEY!,
+    apiSecret: process.env.LEOPARD_API_SECRET!,
+    name: process.env.LEOPARD_APP_NAME!,
+  },
+  smsPlatform: process.env.DEFAULT_SMS_PLATFORM?.toLowerCase().includes('LEOPARD') ? 'smsleopard' : 'africastalking',
 }
