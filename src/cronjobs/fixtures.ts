@@ -4,6 +4,22 @@ import dayjs from 'dayjs'
 import { FastifyInstance } from 'fastify'
 
 export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
+  const checkInId = app.Sentry.captureCheckIn(
+    {
+      monitorSlug: 'upcoming_fixtures_cron',
+      status: 'in_progress',
+    },
+    {
+      schedule: {
+        // Specify your schedule options here
+        type: 'crontab',
+        value: '30 00 * * *',
+      },
+      checkinMargin: 1,
+      maxRuntime: 1,
+      timezone: 'Africa/Nairobi',
+    },
+  )
   try {
     for (let index = 0; index < 3; index++) {
       const fixtures = await getUpcomingFixtures(dayjs().add(index, 'day').toDate())
@@ -40,12 +56,30 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
           })),
       })
     }
+    app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'upcoming_fixtures_cron', status: 'ok' })
   } catch (error) {
     app.Sentry.captureException(error)
+    app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'upcoming_fixtures_cron', status: 'error' })
   }
 }
 
 export const getFixturesResults = async (app: FastifyInstance) => {
+  const checkInId = app.Sentry.captureCheckIn(
+    {
+      monitorSlug: 'fixtures_result_cron',
+      status: 'in_progress',
+    },
+    {
+      schedule: {
+        // Specify your schedule options here
+        type: 'crontab',
+        value: '40 * * * *',
+      },
+      checkinMargin: 1,
+      maxRuntime: 1,
+      timezone: 'Africa/Nairobi',
+    },
+  )
   try {
     const fixtures = await app.prisma.fixture.findMany({
       select: {
@@ -85,8 +119,10 @@ export const getFixturesResults = async (app: FastifyInstance) => {
       )
       await app.prisma.$transaction(transactions)
     }
+    app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'fixtures_result_cron', status: 'ok' })
   } catch (error) {
     app.Sentry.captureException(error)
+    app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'fixtures_result_cron', status: 'error' })
   }
 }
 
