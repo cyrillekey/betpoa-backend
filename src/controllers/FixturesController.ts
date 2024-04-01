@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client'
 import dayjs from 'dayjs'
 
+import { FixturesQueryParams, IDefaultQueryResponse } from './interface/fixtures'
 import { BaseController } from './BaseController'
-import { FixturesQueryParams, IDefaultQueryResponse } from './interface'
 
 class FixturesController extends BaseController {
   async getAllFixtures() {
@@ -115,6 +115,7 @@ class FixturesController extends BaseController {
         include: {
           homeTeam: true,
           awayTeam: true,
+          league: true,
           odds: {
             where: {
               type: 'WINNER_FT',
@@ -140,6 +141,24 @@ class FixturesController extends BaseController {
   }
   async getFixtureById() {
     try {
+      const id = Number((this.req.params as Record<string, any>)?.id)
+      const fixture = await this.app.prisma.fixture.findUnique({
+        where: {
+          id: id,
+        },
+        include: {
+          homeTeam: true,
+          awayTeam: true,
+          odds: true,
+          league: true,
+        },
+      })
+      return this.res.send(<IDefaultQueryResponse>{
+        id: null,
+        success: true,
+        message: 'Success!',
+        data: fixture,
+      })
     } catch (error) {
       this.app.Sentry.captureException(error)
       return this.res.status(500).send(<IDefaultQueryResponse>{
@@ -150,8 +169,20 @@ class FixturesController extends BaseController {
       })
     }
   }
-  async getFixtureResultByFixture() {
+  async getFixtureResultByFixtureId() {
     try {
+      const id = Number((this.req.params as Record<string, any>)?.id)
+      const fixture = await this.app.prisma.fixtureResult.findUnique({
+        where: {
+          id: id,
+        },
+      })
+      return this.res.send(<IDefaultQueryResponse>{
+        id: fixture?.id,
+        success: true,
+        message: 'Success!',
+        data: fixture,
+      })
     } catch (error) {
       this.app.Sentry.captureException(error)
       return this.res.status(500).send(<IDefaultQueryResponse>{
@@ -164,6 +195,18 @@ class FixturesController extends BaseController {
   }
   async getFixtureoddsById() {
     try {
+      const id = Number((this.req.params as Record<string, any>)?.id)
+      const odds = await this.app.prisma.odds.findMany({
+        where: {
+          fixtureId: id,
+        },
+      })
+      return this.res.send(<IDefaultQueryResponse>{
+        id: null,
+        data: odds,
+        success: true,
+        message: 'Success',
+      })
     } catch (error) {
       this.app.Sentry.captureException(error)
       return this.res.status(500).send(<IDefaultQueryResponse>{

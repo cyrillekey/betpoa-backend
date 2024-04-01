@@ -1,3 +1,4 @@
+import { ILeagueResponseBody } from '@controllers/interface/fixtures'
 import LeagueController from '@controllers/LeagueController'
 import { isAuthorized } from '@hooks/Auth'
 import { FastifyPluginAsync } from 'fastify'
@@ -28,17 +29,7 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
             leagues: {
               type: 'array',
               items: {
-                properties: {
-                  id: { type: 'number' },
-                  leagueId: { type: 'number' },
-                  name: { type: 'string' },
-                  logo: { type: 'string' },
-                  type: { type: 'string' },
-                  country: { type: 'string' },
-                  season: { type: 'string' },
-                  createdAt: { type: 'string' },
-                  updatedAt: { type: 'string' },
-                },
+                properties: ILeagueResponseBody,
               },
             },
           },
@@ -67,19 +58,9 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
             id: { type: 'number' },
             success: { type: 'boolean' },
             message: { type: 'string' },
-            leagues: {
+            data: {
               type: 'object',
-              properties: {
-                id: { type: 'number' },
-                leagueId: { type: 'number' },
-                name: { type: 'string' },
-                logo: { type: 'string' },
-                type: { type: 'string' },
-                country: { type: 'string' },
-                season: { type: 'string' },
-                createdAt: { type: 'string' },
-                updatedAt: { type: 'string' },
-              },
+              properties: ILeagueResponseBody,
             },
           },
         },

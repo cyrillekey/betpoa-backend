@@ -3,9 +3,9 @@ import { Prisma } from '@prisma/client'
 import { compare, genSaltSync, hash } from 'bcrypt'
 import dayjs from 'dayjs'
 
+import { IDefaultResponse } from './interface/fixtures'
 import { IPasswordResetBody, IPasswordUpdateBody, ISignInBody, ISignUpBody, IUpdateUserBody, IValidateOptBody } from './interface/user'
 import { BaseController } from './BaseController'
-import { IDefaultResponse } from './interface'
 export class UserController extends BaseController {
   private generateOtp = (length = 4) => {
     let otp = ''

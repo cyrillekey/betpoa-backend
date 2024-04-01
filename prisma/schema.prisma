@@ -123,7 +123,7 @@ model Team {
   homeFixtures Fixture[] @relation(name: "HomeFixtures")
   awayFixtures Fixture[] @relation(name: "AwayFixtures")
   createdAt    DateTime  @default(now())
-  updatedAT    DateTime  @updatedAt
+  updatedAt   DateTime  @updatedAt
 
   @@map("team")
 }

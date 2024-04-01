@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client'
 
+import { IDefaultQueryResponse, LeaguesQueryParams } from './interface/fixtures'
 import { BaseController } from './BaseController'
-import { IDefaultQueryResponse, LeaguesQueryParams } from './interface'
 
 class LeagueController extends BaseController {
   async getAllLeagues() {
