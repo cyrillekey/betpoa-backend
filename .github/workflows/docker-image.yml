@@ -17,7 +17,7 @@ jobs:
     - name: Login to docker registry
       run: docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password ${{ secrets.DOCKERHUB_TOKEN }}
     - uses: 'finnp/create-file-action@master'
-    - name: Build Docker file
+      name: Build Docker file
       env:
         FILE_NAME: '.env'
         FILE_BASE64: '${{ secrets.PRODUCTION_ENV }}'
