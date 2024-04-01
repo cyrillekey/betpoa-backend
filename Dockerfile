@@ -1,7 +1,7 @@
 FROM node:18-alpine as base
 
 WORKDIR /app
-COPY package.json yarn.lock ./
+COPY package.json ./
 FROM base as build
 # RUN yarn --frozen-lockfile
 RUN yarn
