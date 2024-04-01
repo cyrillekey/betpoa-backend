@@ -14,7 +14,7 @@ export const createLeaguesCronjob = async (app: FastifyInstance) => {
         value: '15 00 1 * *',
       },
       checkinMargin: 1,
-      maxRuntime: 1,
+      maxRuntime: 10,
       timezone: 'Africa/Nairobi',
     },
   )

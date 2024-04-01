@@ -16,7 +16,7 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
         value: '30 00 * * *',
       },
       checkinMargin: 1,
-      maxRuntime: 1,
+      maxRuntime: 10,
       timezone: 'Africa/Nairobi',
     },
   )
@@ -76,7 +76,7 @@ export const getFixturesResults = async (app: FastifyInstance) => {
         value: '40 * * * *',
       },
       checkinMargin: 1,
-      maxRuntime: 1,
+      maxRuntime: 10,
       timezone: 'Africa/Nairobi',
     },
   )
