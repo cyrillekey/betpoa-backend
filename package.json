@@ -2,8 +2,7 @@
   "name": "betpoa-backend",
   "version": "1.0.0",
   "description": "This project was bootstrapped with Fastify-CLI.",
-  "main": "app.ts",
-  "type": "module",
+  "main": "app.ts",  
   "directories": {
     "test": "test"
   },

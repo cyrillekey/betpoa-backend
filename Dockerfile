@@ -4,7 +4,6 @@ WORKDIR /usr/src/app
 
 COPY package.json yarn.lock ./
 FROM base as build
-RUN yarn config set ignore-engines true
 RUN yarn --frozen-lockfile
 COPY . .
 RUN yarn generate && yarn build:ts
