@@ -2,7 +2,6 @@ import 'module-alias/register'
 
 import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
 import swagger from '@fastify/swagger'
-import swaggerUi from '@fastify/swagger-ui'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import Sentry from '@immobiliarelabs/fastify-sentry'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
@@ -45,9 +44,7 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
       },
     },
   })
-  fastify.register(swaggerUi, {
-    routePrefix: '/api/documentation',
-  })
+  
 
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
