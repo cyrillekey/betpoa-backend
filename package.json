@@ -2,7 +2,7 @@
   "name": "betpoa-backend",
   "version": "1.0.0",
   "description": "This project was bootstrapped with Fastify-CLI.",
-  "main": "app.ts",  
+  "main": "app.ts",
   "directories": {
     "test": "test"
   },
@@ -32,6 +32,7 @@
     "@fastify/type-provider-typebox": "^4.0.0",
     "@immobiliarelabs/fastify-sentry": "^8.0.1",
     "@prisma/client": "5.11.0",
+    "@scalar/fastify-api-reference": "^1.20.10",
     "@sentry/profiling-node": "^7.109.0",
     "@sinclair/typebox": "^0.32.20",
     "@types/bcrypt": "^5.0.2",
@@ -43,6 +44,7 @@
     "dotenv": "^16.4.5",
     "fastify": "^4.26.1",
     "fastify-cli": "^6.1.1",
+    "fastify-html": "^0.3.3",
     "fastify-plugin": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3"

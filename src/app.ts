@@ -4,9 +4,12 @@ import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
 import swagger from '@fastify/swagger'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import Sentry from '@immobiliarelabs/fastify-sentry'
+// @ts-ignore
+import scalarDocumentation from '@scalar/fastify-api-reference'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
 import { join } from 'path'
+
 export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {}
 // Pass --options via CLI arguments in command to enable these options.
 const options: AppOptions = {}
@@ -19,6 +22,8 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
     dsn: 'https://17fd5490b09d30a0890df64a9cbbb0c2@o4504167984136192.ingest.us.sentry.io/4507005968711680',
     integrations: [nodeProfilingIntegration()],
   })
+  // fastify.register(fastifyHtml)
+
   fastify.register(swagger, {
     openapi: {
       openapi: '3.0.0',
@@ -44,8 +49,14 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
       },
     },
   })
-  
-
+  fastify.register(scalarDocumentation, {
+    routePrefix: '/reference',
+    configuration: {
+      spec: {
+        content: () => fastify.swagger(),
+      },
+    },
+  })
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application

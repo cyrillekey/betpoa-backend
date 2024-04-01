@@ -2,7 +2,7 @@
   "extends": "fastify-tsconfig",
   "compilerOptions": {
     "outDir": "dist",
-    "sourceMap": true,
+    "sourceMap": true,        
     "paths":{
       "@controllers/*": ["./src/controllers/*"],
       "@hooks/*":["./src/hooks/*"],
