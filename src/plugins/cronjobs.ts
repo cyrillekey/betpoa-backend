@@ -4,9 +4,9 @@ import { CronJob } from 'cron'
 import fp from 'fastify-plugin'
 
 export default fp(async (fastify, _opts) => {
-  const getLeaguesJob = new CronJob('15 00 1 * *', async () => await createLeaguesCronjob(fastify))
-  const upcomingFixturesJob = new CronJob('30 00 * * *', async () => await getUpcomingFixturesCronjobs(fastify))
-  const getFixtureResultsJob = new CronJob('40 * * * *', async () => await getFixturesResults(fastify))
+  const getLeaguesJob = new CronJob('15 00 1 * *', async () => await createLeaguesCronjob(fastify), null, null, 'Africa/Nairobi')
+  const upcomingFixturesJob = new CronJob('30 00 * * *', async () => await getUpcomingFixturesCronjobs(fastify), null, null, 'Africa/Nairobi')
+  const getFixtureResultsJob = new CronJob('40 * * * *', async () => await getFixturesResults(fastify), null, null, 'Africa/Nairobi')
 
   getLeaguesJob.start()
   upcomingFixturesJob.start()

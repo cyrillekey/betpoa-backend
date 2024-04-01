@@ -24,6 +24,8 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
     dsn: 'https://17fd5490b09d30a0890df64a9cbbb0c2@o4504167984136192.ingest.us.sentry.io/4507005968711680',
     integrations: [nodeProfilingIntegration()],
     enabled: process.env.NODE_ENV == 'production',
+    tracesSampleRate: 0.3,
+    enableTracing: true,
   })
   // fastify.register(fastifyHtml)
 

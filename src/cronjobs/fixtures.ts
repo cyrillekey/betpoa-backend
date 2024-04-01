@@ -13,11 +13,11 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
       schedule: {
         // Specify your schedule options here
         type: 'crontab',
-        value: '* * * * *',
+        value: '30 00 * * *',
       },
       checkinMargin: 1,
       maxRuntime: 1,
-      timezone: 'America/Los_Angeles',
+      timezone: 'Africa/Nairobi',
     },
   )
   try {
@@ -64,6 +64,22 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
 }
 
 export const getFixturesResults = async (app: FastifyInstance) => {
+  const checkInId = app.Sentry.captureCheckIn(
+    {
+      monitorSlug: 'fixtures_results',
+      status: 'in_progress',
+    },
+    {
+      schedule: {
+        // Specify your schedule options here
+        type: 'crontab',
+        value: '40 * * * *',
+      },
+      checkinMargin: 1,
+      maxRuntime: 1,
+      timezone: 'Africa/Nairobi',
+    },
+  )
   try {
     const fixtures = await app.prisma.fixture.findMany({
       select: {
@@ -103,8 +119,10 @@ export const getFixturesResults = async (app: FastifyInstance) => {
       )
       await app.prisma.$transaction(transactions)
     }
+    app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'fixtures_results', status: 'ok' })
   } catch (error) {
     app.Sentry.captureException(error)
+    app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'fixtures_results', status: 'error' })
   }
 }
 
