@@ -1,5 +1,5 @@
 import { configs } from '@configs/index'
-import { IDefaultResponse } from '@controllers/interface'
+import { IDefaultResponse } from '@controllers/interface/fixtures'
 import { ISignUpBody, IValidateOptBody } from '@controllers/interface/user'
 import { UserController } from '@controllers/UserController'
 import { isAuthorized } from '@hooks/Auth'

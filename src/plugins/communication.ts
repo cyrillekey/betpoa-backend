@@ -43,10 +43,12 @@ const sendSmsLeopardSms = async (fastify: FastifyInstance, phone: string, messag
       },
     }
     const response = await axios(config)
-      .then(() => {
+      .then((resp) => {
+        fastify.log.info(resp?.data)
         return true
       })
       .catch((err) => {
+        fastify.log.info(err?.response?.data)
         fastify.Sentry.captureException(err?.response?.data)
         return false
       })

@@ -1,10 +1,11 @@
+import { configs } from '@configs/index'
 import { Prisma } from '@prisma/client'
 import { compare, genSaltSync, hash } from 'bcrypt'
 import dayjs from 'dayjs'
 
+import { IDefaultResponse } from './interface/fixtures'
 import { IPasswordResetBody, IPasswordUpdateBody, ISignInBody, ISignUpBody, IUpdateUserBody, IValidateOptBody } from './interface/user'
 import { BaseController } from './BaseController'
-import { IDefaultResponse } from './interface'
 export class UserController extends BaseController {
   private generateOtp = (length = 4) => {
     let otp = ''
@@ -79,7 +80,7 @@ export class UserController extends BaseController {
       const body = this.req.body as ISignInBody
       const user = await this.app.prisma.user.findUnique({
         where: {
-          phone: body.phone,
+          phone: this.app.helpers.formatPhoneNumber(body.phone),
         },
       })
       if (!user) {
@@ -148,7 +149,7 @@ export class UserController extends BaseController {
           token,
         },
       })
-      await this.app.messaging.sendSms(user.phone, token)
+      await this.app.messaging.sendSms(user.phone, `Your ${configs.appname} OTP is ${token}. This token is valid for the next 10 minutes`)
       return this.res.status(200).send(<IDefaultResponse>{
         id: null,
         success: true,
@@ -285,7 +286,7 @@ export class UserController extends BaseController {
           token,
         },
       })
-      await this.app.messaging.sendSms(exists.phone, token)
+      await this.app.messaging.sendSms(exists.phone, `Your ${configs.appname} OTP is ${token}. This token is valid for the next 10 minutes`)
       return this.res.status(200).send(<IDefaultResponse>{
         id: null,
         success: true,
@@ -305,7 +306,7 @@ export class UserController extends BaseController {
       const body = this.req.body as IPasswordUpdateBody
       const user = await this.app.prisma.user.findUnique({
         where: {
-          phone: body.phone,
+          phone: this.app.helpers.formatPhoneNumber(body.phone),
         },
       })
       if (!user) {
@@ -327,6 +328,7 @@ export class UserController extends BaseController {
         })
         .then((resp) => resp?.id)
         .catch(() => null)
+
       if (!phoneOtp)
         return this.res.status(400).send(<IDefaultResponse>{
           id: null,
@@ -350,16 +352,22 @@ export class UserController extends BaseController {
         profileId: user?.profileId,
         role: user?.role,
       }
+      await this.app.prisma.otpToken.delete({
+        where: {
+          id: phoneOtp,
+        },
+      })
       const token = this.app.helpers.jwt.sign(jwtUser)
       return this.res.status(200).send({
         id: user?.id,
-        success: false,
+        success: true,
         message: 'Success! Password updated',
         token: token,
         user: jwtUser,
       })
     } catch (error) {
       this.app.Sentry.captureException(error)
+      this.app.log.error(error)
       return this.res.status(500).send(<IDefaultResponse>{
         id: null,
         success: false,
