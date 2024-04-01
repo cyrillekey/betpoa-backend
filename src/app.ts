@@ -34,7 +34,19 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
         title: 'Betpoa Documentation',
         description: 'Betpoa Betting Rest Api Documentation',
         version: '1.0.0',
+        contact: { email: 'cyrilleotieno7@gmail.com' },
+        summary: 'Betpoa backend rest api',
       },
+      tags: [
+        {
+          name: 'Auth',
+          description: 'Betpoa authentication methods covering signup to password reset',
+        },
+        {
+          name: 'User',
+          description: 'Betpoa methods that interact with the user object',
+        },
+      ],
       servers: [
         {
           url: configs.apiurl,
