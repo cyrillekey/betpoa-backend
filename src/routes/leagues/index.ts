@@ -26,7 +26,7 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
             id: { type: 'number' },
             success: { type: 'boolean' },
             message: { type: 'string' },
-            leagues: {
+            data: {
               type: 'array',
               items: {
                 properties: ILeagueResponseBody,
