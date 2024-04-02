@@ -14,18 +14,19 @@ datasource db {
 }
 
 model User {
-  id             Int         @id @default(autoincrement())
-  phone          String      @unique
+  id             Int           @id @default(autoincrement())
+  phone          String        @unique
   password       String
-  role           UserRole    @default(CUSTOMER)
-  phoneValidated Boolean     @default(false)
-  accountBalance Float       @default(0.0)
-  profile        UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  profileId      Int         @unique
-  bets           Bet[]       @relation()
-  resetTokens    OtpToken[]  @relation()
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  role           UserRole      @default(CUSTOMER)
+  phoneValidated Boolean       @default(false)
+  accountBalance Float         @default(0.0)
+  profile        UserProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId      Int           @unique
+  bets           Bet[]         @relation()
+  resetTokens    OtpToken[]    @relation()
+  transactions   Transaction[] @relation()
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   @@map("user")
 }
@@ -78,6 +79,7 @@ model Bet {
   totalMarkets Int             @default(1)
   totalOdds    Float           @default(1.0)
   possibleWin  Float           @default(0.0)
+  status       BETSTATUS       @default(PENDING)
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
@@ -85,15 +87,16 @@ model Bet {
 }
 
 model BetMarketOdds {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   pick      String
-  odd       Odds     @relation(fields: [oddId], references: [id], onDelete: Cascade)
+  odd       Odds      @relation(fields: [oddId], references: [id], onDelete: Cascade)
   oddId     Int
-  bet       Bet      @relation(fields: [betId], references: [id], onDelete: Cascade)
+  bet       Bet       @relation(fields: [betId], references: [id], onDelete: Cascade)
   betId     Int
-  betOdd    Float    @default(1.0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  betOdd    Float     @default(1.0)
+  status    BETSTATUS @default(PENDING)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("betmarketodds")
 }
@@ -123,7 +126,7 @@ model Team {
   homeFixtures Fixture[] @relation(name: "HomeFixtures")
   awayFixtures Fixture[] @relation(name: "AwayFixtures")
   createdAt    DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  updatedAt    DateTime  @updatedAt
 
   @@map("team")
 }
@@ -180,6 +183,36 @@ model Odds {
   @@map("odds")
 }
 
+model Transaction {
+  id                Int               @id @default(autoincrement())
+  amount            Float
+  type              TRANSACTIONTYPE
+  status            TRANSACTIONSTATUS
+  date              DateTime
+  checkoutRequestId String?  
+  merchantRequestId String?
+  transactionId     String
+  phone             String?
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            Int
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  @@unique([checkoutRequestId, merchantRequestId])
+}
+
+enum TRANSACTIONSTATUS {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+enum TRANSACTIONTYPE {
+  DEPOSIT
+  WITHDRAWAL
+  BONUS
+}
+
 enum OddType {
   WINNER_FT
   WINNER_HT
@@ -219,4 +252,11 @@ enum FIXTURERESULT {
   AWAY
   DRAW
   NP // NOT PLAYED
+}
+
+enum BETSTATUS {
+  WON
+  LOST
+  VOID
+  PENDING
 }

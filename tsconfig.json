@@ -8,7 +8,8 @@
       "@hooks/*":["./src/hooks/*"],
       "@configs/*":["./src/configs/*"],
       "@rapidapi/*":["./src/rapidapi/*"],
-      "@cronjobs/*":["./src/cronjobs/*"]
+      "@cronjobs/*":["./src/cronjobs/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "include": ["src/**/*.ts"]

@@ -36,6 +36,14 @@ export interface IConfig {
     staging: boolean
     development: boolean
   }
+  mpesa: {
+    shortCode: number
+    initiatorPassword: string
+    initiatorName: string
+    consumerKey: string
+    consumerSecret: string
+    passKey: string
+  }
   smsPlatform: 'smsleopard' | 'africastalking'
 }
 
@@ -80,4 +88,12 @@ export const configs: IConfig = {
     name: process.env.LEOPARD_APP_NAME!,
   },
   smsPlatform: process.env.DEFAULT_SMS_PLATFORM?.toLowerCase().includes('LEOPARD') ? 'smsleopard' : 'africastalking',
+  mpesa: {
+    initiatorPassword: process.env.INTITIATOR_PASSWORD!,
+    initiatorName: process.env.INTITIATOR_NAME!,
+    shortCode: parseInt(process.env.MPESA_SHORT_CODE!),
+    consumerKey: process.env.CONSUMER_KEY!,
+    consumerSecret: process.env.CONSUMER_SECRET!,
+    passKey: process.env.PASSKEY!,
+  },
 }

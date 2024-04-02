@@ -189,6 +189,67 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
     },
     handler: async (req, res) => new UserController(fastify, req, res).updateUserPassword(),
   })
+  fastify.route({
+    method: 'POST',
+    url: '/deposit',
+    preHandler: isAuthorized,
+    schema: {
+      tags: ['User'],
+      summary: 'Mpesa deposit',
+      description: 'Customer make mpesa deposit',
+      security: [{ bearerAuth: [] }],
+      response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+      },
+      body: {
+        type: 'object',
+        required: ['phone', 'amount'],
+        properties: {
+          phone: { type: 'string', description: 'Mpesa phone number to deposit from' },
+          amount: { type: 'number', description: 'Amount to deposit. Must be greater than 10' },
+        },
+      },
+    },
+    handler: async (req, res) => await new UserController(fastify, req, res).userMpesaDeposit(),
+  })
+  fastify.route({
+    method: 'POST',
+    url: '/withdrawal',
+    preHandler: isAuthorized,
+    schema: {
+      tags: ['User'],
+      summary: 'Mpesa withdrawal',
+      description: 'Customer make mpesa withdrawal',
+      security: [{ bearerAuth: [] }],
+      response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+      },
+      body: {
+        type: 'object',
+        required: ['amount'],
+        properties: {
+          amount: { type: 'number' },
+        },
+      },
+    },
+    handler: async (req, res) => await new UserController(fastify, req, res).userMpesaDeposit(),
+  })
 }
 
 export default userRoutes
