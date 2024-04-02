@@ -16,11 +16,6 @@ import {
   StkResponse,
 } from './type'
 
-Sentry.init({
-  dsn: process?.env?.production
-    ? 'https://97cf720cc266f26eee9d8df64310e4bb@events.ifunza.com/4'
-    : 'https://67ec6114283691cc0666e3ca620840b0@events.ifunza.com/5',
-})
 class MpesaLibrary {
   private static baseUrl: string = process.env.NODE_ENV == 'production' ? 'https://api.safaricom.co.ke' : 'https://sandbox.safaricom.co.ke'
 
