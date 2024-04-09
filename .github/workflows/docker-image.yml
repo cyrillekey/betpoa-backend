@@ -21,7 +21,7 @@ jobs:
         FILE_NAME: '.env'
         FILE_BASE64: '${{ secrets.PRODUCTION_ENV }}'
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag betpoa-backend
+      run: docker build . --file Dockerfile --tag betpoa-backend --build-arg SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
     - name: Tag docker image
       run: docker tag betpoa-backend ${{ secrets.DOCKERHUB_USERNAME }}/betpoa-backend || true
     - name: Push image to docker hub
