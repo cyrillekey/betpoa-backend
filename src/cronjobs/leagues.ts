@@ -28,12 +28,14 @@ export const createLeaguesCronjob = async (app: FastifyInstance) => {
         name: a?.league?.name,
         type: a?.league?.type,
         season: a?.seasons?.at(0)?.year?.toString() ?? '',
+        id: a?.league?.id,
       })),
       skipDuplicates: true,
     })
     app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'get_leagues_cron', status: 'ok' })
   } catch (error) {
     app.Sentry.captureException(error)
+    app.log.error(error)
     app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'get_leagues_cron', status: 'error' })
   }
 }

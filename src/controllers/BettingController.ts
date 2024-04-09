@@ -7,6 +7,7 @@ import { BaseController } from './BaseController'
 export default class BettingController extends BaseController {
   async placeBet() {
     try {
+      // TODO ADD RESTRICTION TO PREVENT BETTING ON ONGOING MATCHES
       const body: IPlaceBetBody = this.body
       const accountBalance = await this.app.prisma.user.findUnique({
         where: {
@@ -30,8 +31,20 @@ export default class BettingController extends BaseController {
           id: {
             in: body.data.map((a) => a?.oddsId),
           },
+          fixture: {
+            date: {
+              gt: dayjs().toDate(),
+            },
+          },
         },
       })
+      if (!odds?.length) {
+        return this.res.status(400).send(<IDefaultResponse>{
+          id: null,
+          success: false,
+          message: 'Failed! No markets to bet on',
+        })
+      }
       let totalOdds = 1.0
       const transaction = odds.reduce((transactions: Prisma.BetMarketOddsCreateManyBetInput[], current) => {
         const pick = body.data.find((a) => a?.oddsId == current?.id)
