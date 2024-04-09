@@ -21,8 +21,9 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
   fastify.withTypeProvider<TypeBoxTypeProvider>()
   // Do not touch the following lines
   fastify.register(Sentry, {
-    dsn: 'https://17fd5490b09d30a0890df64a9cbbb0c2@o4504167984136192.ingest.us.sentry.io/4507005968711680',
+    dsn: 'https://921097d6a76bab89051f3a2d7433fa20@o4507057833902080.ingest.us.sentry.io/4507057837506560',
     integrations: [nodeProfilingIntegration()],
+
     enabled: process.env.NODE_ENV == 'production',
     tracesSampleRate: 0.3,
     enableTracing: true,
