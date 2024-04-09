@@ -1,7 +1,9 @@
 import { configs } from '@configs/index'
 import { Prisma } from '@prisma/client'
+import MpesaLibrary from '@utils/mpesa'
 import { compare, genSaltSync, hash } from 'bcrypt'
 import dayjs from 'dayjs'
+import { v4 } from 'uuid'
 
 import { IDefaultResponse } from './interface/fixtures'
 import { IPasswordResetBody, IPasswordUpdateBody, ISignInBody, ISignUpBody, IUpdateUserBody, IValidateOptBody } from './interface/user'
@@ -375,6 +377,117 @@ export class UserController extends BaseController {
         token: token,
         user: jwtUser,
       })
+    } catch (error) {
+      this.app.Sentry.captureException(error)
+      this.app.log.error(error)
+      return this.res.status(500).send(<IDefaultResponse>{
+        id: null,
+        success: false,
+        message: 'Error! Something went wrong please try again',
+      })
+    }
+  }
+  async userMpesaDeposit() {
+    try {
+      const isPhoneValid = this.app.helpers.validatePhoneNumber(this.body.phone)
+      if (!isPhoneValid) {
+        return this.res.status(400).send(<IDefaultResponse>{
+          id: null,
+          success: false,
+          message: 'Error! Invalid phone number provided',
+        })
+      }
+      if (Number(this.body.amount) < 10) {
+        return this.res.status(400).send(<IDefaultResponse>{
+          id: null,
+          success: false,
+          message: 'Error! Amount should be greater or equal to 10',
+        })
+      }
+      const amount = Number(this.body.amount)
+      const phone = this.app.helpers.formatPhoneNumber(this.body.phone)
+      const mpesa = await MpesaLibrary.initiateMpesaStkPush({ phone, amount, uniqueId: `${configs.appname}` })
+      if (mpesa.success) {
+        await this.app.prisma.transaction.create({
+          data: {
+            userId: this.req.user.id,
+            amount: 0.0,
+            date: new Date(),
+            transactionId: '',
+            type: 'DEPOSIT',
+            status: 'PENDING',
+            checkoutRequestId: mpesa.CheckoutRequestID,
+            merchantRequestId: mpesa.MerchantRequestID,
+          },
+        })
+        return this.res.send(<IDefaultResponse>{
+          success: true,
+          id: null,
+          message: mpesa?.message,
+        })
+      } else {
+        return this.res.status(400).send(<IDefaultResponse>{
+          success: false,
+          id: null,
+          message: mpesa?.message,
+        })
+      }
+    } catch (error) {
+      this.app.Sentry.captureException(error)
+      this.app.log.error(error)
+      return this.res.status(500).send(<IDefaultResponse>{
+        id: null,
+        success: false,
+        message: 'Error! Something went wrong please try again',
+      })
+    }
+  }
+  async mpesaWithdraw() {
+    try {
+      const amount = Number(this.body.amount?.phone.toString())
+      const user = await this.app.prisma.user.findUnique({
+        where: {
+          id: this.req.user.id,
+        },
+        select: {
+          id: true,
+          accountBalance: true,
+          phone: true,
+        },
+      })
+      const hasBalance = user!.accountBalance - amount
+      if (hasBalance < 0) {
+        return this.res.status(400).send(<IDefaultResponse>{
+          id: null,
+          success: false,
+          message: 'Failed! Amount exceeds account balance',
+        })
+      }
+      const mpesa = await MpesaLibrary.payoutToMobileNumber({ phone: user!.phone, amount, reference: v4(), remarks: 'Bepoa Payout' })
+      if (!mpesa?.ConversationID)
+        return this.res.status(400).send(<IDefaultResponse>{
+          id: null,
+          success: false,
+          message: mpesa?.ResponseDescription,
+        })
+      await this.app.prisma.transaction.create({
+        data: {
+          amount,
+          phone: user?.phone,
+          date: dayjs().toDate(),
+          checkoutRequestId: mpesa.ConversationID,
+          merchantRequestId: mpesa.OriginatorConversationID,
+          status: 'PENDING',
+          type: 'WITHDRAWAL',
+          transactionId: '',
+          userId: user!.id,
+        },
+      })
+      return <IDefaultResponse>{
+        id: null,
+        success: true,
+        message: 'Success! Mpesa withdrawal initiated',
+      }
     } catch (error) {
       this.app.Sentry.captureException(error)
       this.app.log.error(error)

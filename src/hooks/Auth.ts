@@ -9,7 +9,7 @@ export async function isAuthorized(req: FastifyRequest, res: FastifyReply) {
       return res.status(401).send({
         id: null,
         success: false,
-        error: 'Not Authorized',
+        message: 'Not Authorized',
       })
     }
     const token = auth.split(' ')[0] === 'Bearer' ? auth.split(' ')[1] : auth
@@ -18,7 +18,7 @@ export async function isAuthorized(req: FastifyRequest, res: FastifyReply) {
       return res.status(401).send({
         id: null,
         success: false,
-        error: 'Not Authorized',
+        message: 'Not Authorized',
       })
     if (userJwt) {
       const user = await req.server.prisma.user.findUnique({
@@ -30,7 +30,7 @@ export async function isAuthorized(req: FastifyRequest, res: FastifyReply) {
         return res.status(401).send({
           id: null,
           success: false,
-          error: 'Not Authorized',
+          message: 'Not Authorized',
         })
       }
       if (user) req.user = user
@@ -43,7 +43,7 @@ export async function isAuthorized(req: FastifyRequest, res: FastifyReply) {
     return res.status(401).send({
       id: null,
       success: false,
-      error: 'Not Authorized',
+      message: 'Not Authorized',
     })
   }
 }

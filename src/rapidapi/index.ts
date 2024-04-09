@@ -2,7 +2,7 @@ import { configs } from '@configs/index'
 import axios, { AxiosRequestConfig } from 'axios'
 import dayjs from 'dayjs'
 
-import { Odds } from './odd'
+import { OddsApiResponse } from './odd'
 import { IFixture, ILeague } from './types'
 
 export const getLeagues = async (): Promise<ILeague[]> => {
@@ -70,7 +70,7 @@ export async function getFixtures(fixturesId: string[]): Promise<IFixture[]> {
   }
 }
 
-export async function getLeagueOdds(date: Date): Promise<Odds[]> {
+export async function getDateOdds(date: Date, page: number = 1): Promise<OddsApiResponse> {
   try {
     const config: AxiosRequestConfig = {
       method: 'GET',
@@ -79,17 +79,27 @@ export async function getLeagueOdds(date: Date): Promise<Odds[]> {
         'X-RapidAPI-Key': configs.rapidApiKey,
         'X-RapidAPI-Host': configs.rapidApiHost,
       },
-      params: { date: dayjs(date).format('YYYY-MM-DD'), bookmaker: 8 },
+      params: { date: dayjs(date).format('YYYY-MM-DD'), bookmaker: 8, page },
     }
     const odds = await axios(config)
       .then((resp) => {
         console?.log(resp?.data?.paging)
 
-        return resp?.data?.response
+        return <OddsApiResponse>{
+          odds: resp?.data?.response,
+          hasNext: resp?.data?.paging?.current == resp?.data?.paging?.total,
+          page: resp?.data?.paging?.current,
+          total: resp?.data?.paging?.total,
+        }
       })
-      ?.catch(() => null)
+      ?.catch(() => <OddsApiResponse>{ hasNext: false, page: 1, odds: [], total: 0 })
     return odds
   } catch (error) {
-    return []
+    return {
+      hasNext: false,
+      page: 1,
+      odds: [],
+      total: 0,
+    }
   }
 }

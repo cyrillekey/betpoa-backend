@@ -1,5 +1,12 @@
 import { MATCHSTATUS } from '@prisma/client'
-
+export interface PlaceBetInputBody {
+  oddsId: number
+  pick: string
+}
+export interface IPlaceBetBody {
+  amount: number
+  data: PlaceBetInputBody[]
+}
 export interface IDefaultResponse {
   success: boolean
   message: string
@@ -86,4 +93,8 @@ export const IFixtureResults = {
   extraHomeGoals: { type: ['null', 'number'] },
   extraAwayGoals: { type: ['null', 'number'] },
   fixtureId: { type: ['number'] },
+}
+export const IPlaceBetInput = {
+  oddsId: { type: 'number' },
+  pick: { type: 'string' },
 }

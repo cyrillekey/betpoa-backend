@@ -4,7 +4,12 @@ export interface Odds {
   update: Date
   bookmakers: Bookmaker[]
 }
-
+export interface OddsApiResponse {
+  page: number
+  hasNext: boolean
+  odds: Odds[]
+  total: number
+}
 interface Bookmaker {
   id: number
   name: string

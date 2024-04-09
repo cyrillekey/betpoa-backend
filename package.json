@@ -11,7 +11,8 @@
     "@hooks": "dist/hooks",
     "@configs": "dist/configs",
     "@rapidapi": "dist/rapidapi",
-    "@cronjobs": "dist/cronjobs"
+    "@cronjobs": "dist/cronjobs",
+    "@utils": "dist/utils"
   },
   "scripts": {
     "test": "npm run build:ts && tsc -p test/tsconfig.json && c8 node --test -r ts-node/register test/**/*.ts",
@@ -49,10 +50,12 @@
     "fastify-html": "^0.3.3",
     "fastify-plugin": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
-    "module-alias": "^2.2.3"
+    "module-alias": "^2.2.3",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.4.4",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "c8": "^9.0.0",
