@@ -145,7 +145,7 @@ model Fixture {
   awayTeamId    Int
   fixtureResult FIXTURERESULT  @default(NP)
   result        FixtureResult? @relation()
-  odds          Odds?          @relation()
+  odds          Odds []          @relation()
   shortStatus   String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -175,7 +175,7 @@ model Odds {
   odd       Float           @default(1.0)
   type      OddType
   fixture   Fixture         @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
-  fixtureId Int             @unique
+  fixtureId Int             
   betSlips  BetMarketOdds[] @relation()
   createdAt DateTime        @default(now())
   updatedAt DateTime        @updatedAt

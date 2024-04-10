@@ -23,34 +23,36 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
 
   try {
     for (let index = 0; index < 3; index++) {
-      const fixtures = await getUpcomingFixtures(dayjs().add(index, 'day').toDate())
-      const allTeams = fixtures
-        .map((a) => {
-          if (a?.teams?.home && a?.teams?.away) return [a?.teams?.away, a?.teams.home]
-          return []
-        })
-        .flat()
+      app.log.info(`Genetating fixtures for ${dayjs().add(index, 'day').toDate()}`)
+      try {
+        const fixtures = await getUpcomingFixtures(dayjs().add(index, 'day').toDate())
+        const allTeams = fixtures
+          .map((a) => {
+            if (a?.teams?.home && a?.teams?.away) return [a?.teams?.away, a?.teams.home]
+            return []
+          })
+          .flat()
 
-      const teamIds = [...new Set(allTeams?.map((a) => a?.id))]
-      const teams = teamIds.map((a) => allTeams.find((b) => b?.id == a))
-      await app.prisma.team.createMany({
-        skipDuplicates: true,
-        data: teams?.map((a) => ({
-          teamId: a!.id,
-          code: a!.name,
-          logo: a!.logo,
-          name: a!.name,
-          venue: '',
-          id: a?.id,
-        })),
-      })
-      const fixturesTransaction: any[] = []
-      fixtures
-        .filter((a) => a?.teams?.away && a?.teams?.home)
-        .forEach((a) =>
-          fixturesTransaction.push(
-            app.prisma.fixture.create({
-              data: {
+        const teamIds = [...new Set(allTeams?.map((a) => a?.id))]
+        const teams = teamIds.map((a) => allTeams.find((b) => b?.id == a))
+
+        await app.prisma.team.createMany({
+          skipDuplicates: true,
+          data: teams?.map((a) => ({
+            teamId: a!.id,
+            code: a!.name,
+            logo: a!.logo,
+            name: a!.name,
+            venue: '',
+            id: a?.id,
+          })),
+        })
+        const fixturesTransaction: any[] = [
+          app.prisma.fixture.createMany({
+            skipDuplicates: true,
+            data: fixtures
+              .filter((a) => a?.teams?.away && a?.teams?.home)
+              .map((a) => ({
                 fixtureId: a?.fixture?.id,
                 awayTeamId: a?.teams?.away?.id,
                 homeTeamId: a?.teams?.home?.id,
@@ -59,26 +61,41 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
                 referee: a?.fixture?.referee ?? 'N/A',
                 shortStatus: a?.fixture?.status?.short,
                 status: getFixtureStatus(a!.fixture!.status!.short!),
-                result: {
-                  create: {
-                    awayGoals: a?.score?.fulltime?.away,
-                    homeGoals: a?.score?.fulltime?.home,
-                    htAwayGoals: a?.score?.halftime?.away,
-                    htHomeGoals: a?.score?.halftime?.home,
-                    extraAwayGoals: a?.score?.extratime?.away,
-                    extraHomeGoals: a?.score?.extratime?.home,
+              })),
+          }),
+          ...fixtures
+            .filter((a) => a?.teams?.away && a?.teams?.home)
+            .map((a) =>
+              app.prisma.fixtureResult.create({
+                data: {
+                  awayGoals: a?.score?.fulltime?.away,
+                  homeGoals: a?.score?.fulltime?.home,
+                  htAwayGoals: a?.score?.halftime?.away,
+                  htHomeGoals: a?.score?.halftime?.home,
+                  extraAwayGoals: a?.score?.extratime?.away,
+                  extraHomeGoals: a?.score?.extratime?.home,
+                  fixture: {
+                    connect: {
+                      fixtureId: a?.fixture?.id,
+                    },
                   },
                 },
-              },
-            }),
-          ),
-        )
-      await app.prisma.$transaction(fixturesTransaction)
+              }),
+            ),
+        ]
+
+        await app.prisma.$transaction(fixturesTransaction)
+        app.log.info(`Genetating fixtures for ${dayjs().add(index, 'day').toDate()}`)
+      } catch (error) {
+        app.Sentry.captureException(error)
+        app.log.error(error)
+      }
     }
     app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'upcoming_fixtures_cron', status: 'ok' })
+    app.log.info(`Finished generating fixtures `)
   } catch (error) {
     app.Sentry.captureException(error, { level: 'fatal' })
-    console.log(error)
+    app.log.error(error)
     app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'upcoming_fixtures_cron', status: 'error' })
   }
 }
