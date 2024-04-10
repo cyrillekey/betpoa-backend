@@ -121,6 +121,7 @@ export const getFixturesResults = async (app: FastifyInstance) => {
     const fixtures = await app.prisma.fixture.findMany({
       select: {
         fixtureId: true,
+        id: true,
       },
       where: {
         status: {
@@ -138,7 +139,7 @@ export const getFixturesResults = async (app: FastifyInstance) => {
       const transactions = results.map((a) =>
         app.prisma.fixtureResult.update({
           where: {
-            fixtureId: a?.fixture?.id,
+            fixtureId: fixtures.find((b) => b?.fixtureId == a?.fixture?.id)?.id,
           },
           data: {
             awayGoals: a?.score?.fulltime?.away,

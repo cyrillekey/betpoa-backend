@@ -110,8 +110,96 @@ export default class BettingController extends BaseController {
       })
     }
   }
-  async cancelBet() {}
-  async getGets() {}
+  async cancelBet() {
+    try {
+      const betId = Number((this.req.params as any).id)
+      const bet = await this.app.prisma.bet.findUnique({
+        where: {
+          id: betId,
+          userId: this.user.id,
+        },
+        include: {
+          markets: {
+            where: {
+              odd: {
+                fixture: {
+                  date: {
+                    lte: dayjs().toDate(),
+                  },
+                },
+              },
+            },
+          },
+        },
+      })
+      if (!bet) {
+        return this.res.status(400).send(<IDefaultResponse>{
+          id: null,
+          success: false,
+          message: 'Failed! Bet not found please try again',
+        })
+      }
+      if (bet?.markets?.length > 0) {
+        return this.res.status(400).send(<IDefaultResponse>{
+          id: bet?.id,
+          success: false,
+          message: 'Failed! Bet has matches which have already begun',
+        })
+      }
+      await this.app.prisma.bet.update({
+        where: {
+          id: bet.id,
+        },
+        data: {
+          status: 'CANCELLED',
+          user: {
+            update: {
+              accountBalance: bet.amountPlaced,
+            },
+          },
+        },
+      })
+      return this.res.status(200).send(<IDefaultResponse>{
+        id: bet?.id,
+        success: true,
+        message: 'Success! Bet placed successfuly',
+      })
+    } catch (error) {
+      this.app.Sentry.captureException(error)
+      return this.res.status(500).send(<IDefaultQueryResponse>{
+        id: null,
+        success: false,
+        message: 'Error! Something went wrong please try again',
+        data: null,
+      })
+    }
+  }
+  async getGets() {
+    try {
+      const bets = await this.app.prisma.bet.findMany({
+        where: {
+          userId: this.user.id,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+      return <IDefaultQueryResponse>{
+        id: null,
+        success: true,
+        data: bets,
+        message: 'Success! Bets found',
+      }
+    } catch (error) {
+      this.app.Sentry.captureException(error)
+      return this.res.status(500).send(<IDefaultQueryResponse>{
+        id: null,
+        data: [],
+        success: false,
+        message: 'Error! Something went wrong please try again',
+      })
+    }
+  }
   async getBet() {}
   async getBetItems() {}
 }

@@ -37,10 +37,12 @@ export abstract class BaseController {
    */
   protected res: FastifyReply
 
+  protected user
   constructor(app: FastifyInstance, req: FastifyRequest, res: FastifyReply) {
     this.app = app
     this.body = req.body
     this.req = req
     this.res = res
+    this.user = req.user
   }
 }
