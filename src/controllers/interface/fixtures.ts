@@ -68,6 +68,16 @@ export const IOdds = {
   type: { type: 'string', enum: [''] },
   fixtureId: { type: 'string' },
 }
+export const IFixtureResults = {
+  id: { type: 'number' },
+  homeGoals: { type: ['number', 'null'] },
+  awayGoals: { type: ['number', 'null'] },
+  htHomeGoals: { type: ['number', 'null'] },
+  htAwayGoals: { type: ['number', 'null'] },
+  extraHomeGoals: { type: ['null', 'number'] },
+  extraAwayGoals: { type: ['null', 'number'] },
+  fixtureId: { type: ['number'] },
+}
 export const FixtureResponse = {
   id: { type: 'number' },
   fixtureId: { type: 'number' },
@@ -82,18 +92,9 @@ export const FixtureResponse = {
   awayTeamId: { type: 'number' },
   fixtureResult: { type: 'string', enum: ['HOME', 'AWAY', 'DRAW', 'NP'], default: 'NP' },
   odds: { type: 'array', items: { properties: IOdds } },
+  result: IFixtureResults,
 }
 
-export const IFixtureResults = {
-  id: { type: 'number' },
-  homeGoals: { type: ['number', 'null'] },
-  awayGoals: { type: ['number', 'null'] },
-  htHomeGoals: { type: ['number', 'null'] },
-  htAwayGoals: { type: ['number', 'null'] },
-  extraHomeGoals: { type: ['null', 'number'] },
-  extraAwayGoals: { type: ['null', 'number'] },
-  fixtureId: { type: ['number'] },
-}
 export const IPlaceBetInput = {
   oddsId: { type: 'number' },
   pick: { type: 'string' },
