@@ -1,6 +1,5 @@
 import FixturesController from '@controllers/FixturesController'
 import { FixtureResponse, IFixtureResults } from '@controllers/interface/fixtures'
-import { isAuthorized } from '@hooks/Auth'
 import { FastifyPluginAsync } from 'fastify'
 
 const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
@@ -11,7 +10,6 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
         summary: 'Get all fixtures',
         tags: ['Fixture'],
         description: 'Get all fixtures',
-        security: [{ bearerAuth: [] }],
         response: {
           default: {
             type: 'object',
@@ -39,7 +37,6 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
           status: { type: 'string', enum: ['FINISHED', 'UPCOMMING', 'ABANDONED', 'INPLAY', 'CANCELLED'] },
         },
       },
-      preHandler: isAuthorized,
     },
     async (request, reply) => {
       return await new FixturesController(fastify, request, reply).getAllFixtures()
@@ -48,7 +45,7 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
   fastify.route({
     method: 'GET',
     url: '/:id',
-    preHandler: isAuthorized,
+
     handler: (req, res) => new FixturesController(fastify, req, res).getFixtureById(),
     schema: {
       summary: 'Get fixture by Id',
@@ -57,7 +54,6 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
       params: {
         id: { type: 'number' },
       },
-      security: [{ bearerAuth: [] }],
       response: {
         default: {
           type: 'object',
@@ -84,7 +80,6 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
       params: {
         id: { type: 'number', description: 'Fixture id' },
       },
-      security: [{ bearerAuth: [] }],
       response: {
         default: {
           type: 'object',
@@ -100,13 +95,11 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
         },
       },
     },
-    preHandler: isAuthorized,
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixtureResultByFixtureId(),
   })
   fastify.route({
     method: 'GET',
     url: '/odds/:id',
-    preHandler: isAuthorized,
     schema: {
       tags: ['Fixture'],
       security: [{ bearerAuth: [] }],

@@ -29,7 +29,6 @@ class LeagueController extends BaseController {
       }
       const take: number = Number(queryParams?.pageSize) ?? 100
       const skip: number = isNaN((Number(queryParams?.page) ?? 0) * take) ? 0 : (Number(queryParams?.page) ?? 0) * take
-      console.log(skip)
 
       const leagues = await this.app.prisma.league.findMany({
         where,
