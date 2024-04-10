@@ -7,6 +7,7 @@ class LeagueController extends BaseController {
   async getAllLeagues() {
     try {
       const queryParams: LeaguesQueryParams = this.req.query as LeaguesQueryParams
+      console.log(queryParams)
       const where: Prisma.LeagueWhereInput = {
         AND: [],
       }
@@ -26,8 +27,9 @@ class LeagueController extends BaseController {
           },
         ]
       }
-      const take: number = queryParams?.pageSize ?? 100
-      const skip: number = (queryParams?.page ?? 0) * take
+      const take: number = Number(queryParams?.pageSize) ?? 100
+      const skip: number = isNaN((Number(queryParams?.page) ?? 0) * take) ? 0 : (Number(queryParams?.page) ?? 0) * take
+      console.log(skip)
 
       const leagues = await this.app.prisma.league.findMany({
         where,
@@ -41,6 +43,7 @@ class LeagueController extends BaseController {
         data: leagues,
       })
     } catch (error) {
+      this.app.log.error(error)
       this.app.Sentry.captureException(error)
       return this.res.status(500).send(<IDefaultQueryResponse>{
         id: null,

@@ -17,7 +17,6 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
         year: { type: 'string' },
         country: { type: 'string' },
       },
-      security: [{ bearerAuth: [] }],
       response: {
         default: {
           description: 'Default response',
@@ -36,7 +35,7 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
         },
       },
     },
-    preHandler: isAuthorized,
+
     handler: async (req, res) => await new LeagueController(fastify, req, res).getAllLeagues(),
   })
   fastify.route({
