@@ -7,7 +7,7 @@ import { BaseController } from './BaseController'
 class FixturesController extends BaseController {
   async getAllFixtures() {
     try {
-      const body = this.body as FixturesQueryParams
+      const body = this.req.params as FixturesQueryParams
       const where: Prisma.FixtureWhereInput = {
         AND: [],
       }
@@ -110,8 +110,12 @@ class FixturesController extends BaseController {
           ]
         }
       }
+      const take: number = Number(body?.pageSize) ?? 100
+      const skip: number = isNaN((Number(body?.page) ?? 0) * take) ? 0 : (Number(body?.page) ?? 0) * take
       const fixtures = await this.app.prisma.fixture.findMany({
         where: where,
+        take,
+        skip,
         include: {
           homeTeam: true,
           awayTeam: true,
