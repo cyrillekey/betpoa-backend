@@ -19,7 +19,7 @@ export default fp(async (fastify, _opts) => {
     'Africa/Nairobi',
   )
   const getFixtureResultsJob = new FixturesResultsCron('40 * * * *', async () => await getFixturesResults(fastify), null, null, 'Africa/Nairobi')
-  const getOddsJob = new GetOddsCronJob('00 02 * * *', async () => await getFixturesOdds(fastify), null, null, 'Africa/Nairobi')
+  const getOddsJob = new GetOddsCronJob('06 11 * * *', async () => await getFixturesOdds(fastify), null, null, 'Africa/Nairobi')
   getLeaguesJob.start()
   upcomingFixturesJob.start()
   getFixtureResultsJob.start()

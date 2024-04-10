@@ -22,8 +22,9 @@ export const getFixturesOdds = async (app: FastifyInstance) => {
   )
   try {
     // get next three days odds
-
+    app.log.info('Generating odds cronjob starting')
     for (let index = 0; index < 3; index++) {
+      app.log.info(`Generating odds for ${dayjs().add(index, 'day').toDate()}`)
       const oddsResponse = await getDateOdds(dayjs().add(index, 'day').toDate())
 
       await saveOddsToDatabase(app, oddsResponse?.odds)
@@ -35,9 +36,11 @@ export const getFixturesOdds = async (app: FastifyInstance) => {
         }
       }
     }
-
+    app.log.info('Generating odds cronjob finished')
     app.Sentry.captureCheckIn({ checkInId, status: 'ok', monitorSlug: 'fixtures_odds_cron' })
   } catch (error) {
+    app.log.error(error)
+    app.log.info('Generating odds cronjob crashed')
     app.Sentry.captureCheckIn({ checkInId, status: 'error', monitorSlug: 'fixtures_odds_cron' })
   }
 }
@@ -63,7 +66,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
           switch (market.name) {
             case 'Match Winner':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -77,7 +80,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Home/Away':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -91,7 +94,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Second Half Winner':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -105,7 +108,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Goals Over/Under':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -120,7 +123,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Goals Over/Under First Half':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -135,7 +138,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Goals Over/Under - Second Half':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -149,7 +152,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'HT/FT Double':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -164,7 +167,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Both Teams Score':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -178,7 +181,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Exact Score':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -192,7 +195,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Correct Score - First Half':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -206,7 +209,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Double Chance':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -220,7 +223,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'First Half Winner':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -234,7 +237,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Total - Home':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -249,7 +252,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Total - Away':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -264,7 +267,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Double Chance - First Half':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -278,7 +281,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Odd/Even':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -292,7 +295,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Odd/Even - First Half':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -306,7 +309,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Home Odd/Even':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -320,7 +323,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Away Odd/Even':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -334,7 +337,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Exact Goals Number':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -349,7 +352,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Home Team Exact Goals Number':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -364,7 +367,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
               break
             case 'Away Team Exact Goals Number':
               transaction.push(
-                market.values.map((a) =>
+                ...market.values.map((a) =>
                   app.prisma.odds.create({
                     data: {
                       fixtureId: fixture?.id,
@@ -382,6 +385,7 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
           }
         })
       })
+      await app.prisma.$transaction(transaction)
     }
   } catch (error) {
     app.Sentry.captureException(error)
