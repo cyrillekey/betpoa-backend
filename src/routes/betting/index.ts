@@ -1,6 +1,7 @@
 import BettingController from '@controllers/BettingController'
 import { IPlaceBetInput } from '@controllers/interface/fixtures'
 import { isAuthorized } from '@hooks/Auth'
+import { BETSTATUS } from '@prisma/client'
 import { FastifyPluginAsync } from 'fastify'
 
 const bettingRoute: FastifyPluginAsync = async (fastify): Promise<void> => {
@@ -50,6 +51,11 @@ const bettingRoute: FastifyPluginAsync = async (fastify): Promise<void> => {
       summary: 'Customer bets',
       description: 'Get all placed bet for the currently logged in user',
       tags: ['Bet'],
+      querystring: {
+        from: { type: 'string' },
+        to: { type: 'string' },
+        status: { type: 'array', items: { type: 'string', enum: ['WON', 'LOST', 'VOID', 'PENDING', 'CANCELLED'] satisfies BETSTATUS[] } },
+      },
       security: [{ bearerAuth: [] }],
     },
     handler: async (req, res) => await new BettingController(fastify, req, res).getGets(),
