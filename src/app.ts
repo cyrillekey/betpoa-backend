@@ -1,6 +1,7 @@
 import 'module-alias/register'
 
 import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
+import cors from '@fastify/cors'
 import swagger from '@fastify/swagger'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import Sentry from '@immobiliarelabs/fastify-sentry'
@@ -29,7 +30,9 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
     release: '1.0.0',
   })
   // fastify.register(fastifyHtml)
-
+  fastify.register(cors, {
+    origin: false,
+  })
   fastify.register(swagger, {
     openapi: {
       openapi: '3.0.0',
