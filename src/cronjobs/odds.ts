@@ -1,3 +1,4 @@
+import { OddType, Prisma } from '@prisma/client'
 import { getDateOdds } from '@rapidapi/index'
 import { Odds } from '@rapidapi/odd'
 import dayjs from 'dayjs'
@@ -59,325 +60,237 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
           },
         },
       })
-      const transaction: any[] = []
+      const transaction: Prisma.OddsCreateManyInput[] = []
       fixtures.forEach((fixture) => {
         const markets = odds.find((a) => a?.fixture?.id == fixture?.fixtureId)?.bookmakers?.at(0)?.bets
         markets?.forEach((market) => {
           switch (market.name) {
             case 'Match Winner':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'WINNER_FT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'WINNER_FT' as OddType,
+                })),
               )
               break
             case 'Home/Away':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'HOME_OR_AWAY',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'HOME_OR_AWAY' as OddType,
+                })),
               )
               break
             case 'Second Half Winner':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'WINNER_2HT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'WINNER_2HT' as OddType,
+                })),
               )
               break
             case 'Goals Over/Under':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      value: a?.value.toString().slice(-3),
-                      type: 'OVER_UNDER_FT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  value: a?.value.toString().slice(-3),
+                  type: 'OVER_UNDER_FT' as OddType,
+                })),
               )
               break
             case 'Goals Over/Under First Half':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      value: a?.value.toString().slice(-3),
-                      type: 'OVER_UNDER_HT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  value: a?.value.toString().slice(-3),
+                  type: 'OVER_UNDER_HT' as OddType,
+                })),
               )
               break
             case 'Goals Over/Under - Second Half':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'OVER_UNDER_HT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'OVER_UNDER_HT' as OddType,
+                })),
               )
               break
             case 'HT/FT Double':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      value: a?.value.toString(),
-                      type: 'HALFTIME_FULLTIME',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  value: a?.value.toString(),
+                  type: 'HALFTIME_FULLTIME' as OddType,
+                })),
               )
               break
             case 'Both Teams Score':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'BOTH_TEAM_SCORE',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'BOTH_TEAM_SCORE' as OddType,
+                })),
               )
               break
             case 'Exact Score':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'EXACT_SCORE_FT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'EXACT_SCORE_FT' as OddType,
+                })),
               )
               break
             case 'Correct Score - First Half':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'EXACT_SCORE_HT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'EXACT_SCORE_HT' as OddType,
+                })),
               )
               break
             case 'Double Chance':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'DOUBLE_CHANCE',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'DOUBLE_CHANCE' as OddType,
+                })),
               )
               break
             case 'First Half Winner':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'WINNER_HT',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'WINNER_HT' as OddType,
+                })),
               )
               break
             case 'Total - Home':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'OVER_HOME',
-                      value: a?.value.toString().slice(-3),
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'OVER_HOME' as OddType,
+                  value: a?.value.toString().slice(-3),
+                })),
               )
               break
             case 'Total - Away':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'OVER_AWAY',
-                      value: a?.value.toString().slice(-3),
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'OVER_AWAY' as OddType,
+                  value: a?.value.toString().slice(-3),
+                })),
               )
               break
             case 'Double Chance - First Half':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'OVER_AWAY',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'OVER_AWAY' as OddType,
+                })),
               )
               break
             case 'Odd/Even':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'FT_ODD_EVEN',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'FT_ODD_EVEN' as OddType,
+                })),
               )
               break
             case 'Odd/Even - First Half':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'HALF_ODD_EVEN',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'HALF_ODD_EVEN' as OddType,
+                })),
               )
               break
             case 'Home Odd/Even':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'HOME_ODD_EVEN',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'HOME_ODD_EVEN' as OddType,
+                })),
               )
               break
             case 'Away Odd/Even':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'AWAY_ODD_EVEN',
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'AWAY_ODD_EVEN' as OddType,
+                })),
               )
               break
             case 'Exact Goals Number':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'TOTAL_GOALS',
-                      value: a?.value?.toString(),
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'TOTAL_GOALS' as OddType,
+                  value: a?.value?.toString(),
+                })),
               )
               break
             case 'Home Team Exact Goals Number':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'TOTAL_GOALS_HOME',
-                      value: a?.value?.toString(),
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'TOTAL_GOALS_HOME' as OddType,
+                  value: a?.value?.toString(),
+                })),
               )
               break
             case 'Away Team Exact Goals Number':
               transaction.push(
-                ...market.values.map((a) =>
-                  app.prisma.odds.create({
-                    data: {
-                      fixtureId: fixture?.id,
-                      name: a?.value.toString(),
-                      odd: Number(a?.odd),
-                      type: 'TOTAL_GOALS_AWAY',
-                      value: a?.value?.toString(),
-                    },
-                  }),
-                ),
+                ...market.values.map((a) => ({
+                  fixtureId: fixture?.id,
+                  name: a?.value.toString(),
+                  odd: Number(a?.odd),
+                  type: 'TOTAL_GOALS_AWAY' as OddType,
+                  value: a?.value?.toString(),
+                })),
               )
               break
             default:
@@ -385,7 +298,10 @@ const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
           }
         })
       })
-      await app.prisma.$transaction(transaction)
+      await app.prisma.odds.createMany({
+        skipDuplicates: true,
+        data: transaction,
+      })
     }
   } catch (error) {
     app.Sentry.captureException(error)
