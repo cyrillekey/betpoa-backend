@@ -31,7 +31,7 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
   })
   // fastify.register(fastifyHtml)
   fastify.register(cors, {
-    origin: false,
+    origin: true,
   })
   fastify.register(swagger, {
     openapi: {
