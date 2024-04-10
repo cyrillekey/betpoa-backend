@@ -7,9 +7,21 @@ import { BaseController } from './BaseController'
 class FixturesController extends BaseController {
   async getAllFixtures() {
     try {
-      const body = this.req.params as FixturesQueryParams
+      const body = this.req.query as FixturesQueryParams
+
       const where: Prisma.FixtureWhereInput = {
-        AND: [],
+        AND: [
+          {
+            odds: {
+              some: {},
+            },
+          },
+          {
+            date: {
+              gte: dayjs().subtract(90, 'minutes').toDate(),
+            },
+          },
+        ],
       }
       if (body?.fromDate) {
         where.AND = [
@@ -110,7 +122,7 @@ class FixturesController extends BaseController {
           ]
         }
       }
-      const take: number = Number(body?.pageSize) ?? 100
+      const take: number = isNaN(Number(body?.pageSize)) ? 100 : Number(body?.pageSize)
       const skip: number = isNaN((Number(body?.page) ?? 0) * take) ? 0 : (Number(body?.page) ?? 0) * take
       const fixtures = await this.app.prisma.fixture.findMany({
         where: where,
@@ -120,6 +132,7 @@ class FixturesController extends BaseController {
           homeTeam: true,
           awayTeam: true,
           league: true,
+          result: true,
           odds: {
             where: {
               type: 'WINNER_FT',
@@ -127,6 +140,7 @@ class FixturesController extends BaseController {
           },
         },
       })
+
       return this.res.send(<IDefaultQueryResponse>{
         id: null,
         success: true,
@@ -135,6 +149,7 @@ class FixturesController extends BaseController {
       })
     } catch (error) {
       this.app.Sentry.captureException(error)
+      this.app.log.error(error)
       return this.res.status(500).send(<IDefaultQueryResponse>{
         id: null,
         success: false,
