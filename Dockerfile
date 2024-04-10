@@ -1,5 +1,6 @@
 FROM node:20-alpine as base
 
+ARG SENTRY_AUTH_TOKEN
 WORKDIR /app
 
 COPY package.json yarn.lock ./
