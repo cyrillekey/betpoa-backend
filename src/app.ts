@@ -23,7 +23,7 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
   fastify.register(Sentry, {
     dsn: 'https://921097d6a76bab89051f3a2d7433fa20@o4507057833902080.ingest.us.sentry.io/4507057837506560',
     integrations: [nodeProfilingIntegration()],
-    enabled: process.env.NODE_ENV == 'production',
+    enabled: process.env.NODE_ENV == 'production' || process.env.NODE_ENV == 'staging',
     tracesSampleRate: 0.3,
     enableTracing: true,
     release: '1.0.0',
