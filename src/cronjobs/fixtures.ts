@@ -1,5 +1,5 @@
 import { MATCHSTATUS } from '@prisma/client'
-import { getFixtures, getUpcomingFixtures } from '@rapidapi/index'
+import { getUpcomingFixtures } from '@rapidapi/index'
 import dayjs from 'dayjs'
 import { FastifyInstance } from 'fastify'
 
@@ -118,48 +118,47 @@ export const getFixturesResults = async (app: FastifyInstance) => {
     },
   )
   try {
-    const fixtures = await app.prisma.fixture.findMany({
-      select: {
-        fixtureId: true,
-        id: true,
-      },
+    const resultsToday = await getUpcomingFixtures(dayjs().toDate())
+    const fixtureIds = resultsToday.map((a) => a?.fixture?.id)
+    const results = await app.prisma.fixtureResult.findMany({
       where: {
-        status: {
-          notIn: ['ABANDONED', 'CANCELLED', 'FINISHED'],
+        fixture: {
+          fixtureId: {
+            in: fixtureIds,
+          },
         },
-        date: {
-          lte: dayjs().add(10, 'minutes').toDate(),
+      },
+      select: {
+        fixture: {
+          select: {
+            fixtureId: true,
+            id: true,
+          },
         },
       },
     })
-    const pages = Math.floor(fixtures?.length / 2)
-    for (let index = 0; index < pages; index++) {
-      const ids = fixtures.slice(index * 20 + index * 20 + 20).map((a) => a?.fixtureId.toString())
-      const results = await getFixtures(ids)
-      const transactions = results.map((a) =>
-        app.prisma.fixtureResult.update({
-          where: {
-            fixtureId: fixtures.find((b) => b?.fixtureId == a?.fixture?.id)?.id,
-          },
-          data: {
-            awayGoals: a?.score?.fulltime?.away,
-            homeGoals: a?.score?.fulltime?.home,
-            extraAwayGoals: a?.score?.extratime?.away,
-            extraHomeGoals: a?.score?.extratime?.home,
-            htAwayGoals: a?.score?.halftime?.away,
-            htHomeGoals: a?.score?.halftime?.home,
-            fixture: {
-              update: {
-                status: getFixtureStatus(a.fixture?.status?.short),
-                shortStatus: a?.fixture?.status?.short,
-              },
+    for (let index = 0; index < results.length; index++) {
+      const result = resultsToday.find((a) => a?.fixture?.id == results[index]?.fixture?.fixtureId)
+      await app.prisma.fixtureResult.update({
+        where: {
+          fixtureId: results[index]?.fixture?.id,
+        },
+        data: {
+          awayGoals: result?.score?.fulltime?.away,
+          homeGoals: result?.score?.fulltime?.home,
+          extraAwayGoals: result?.score?.extratime?.away,
+          extraHomeGoals: result?.score?.extratime?.home,
+          htAwayGoals: result?.score?.halftime?.away,
+          htHomeGoals: result?.score?.halftime?.home,
+          fixture: {
+            update: {
+              status: getFixtureStatus(result?.fixture?.status?.short ?? 'NP'),
+              shortStatus: result?.fixture?.status?.short,
             },
           },
-        }),
-      )
-      await app.prisma.$transaction(transactions)
+        },
+      })
     }
-    app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'fixtures_result_cron', status: 'ok' })
   } catch (error) {
     app.Sentry.captureException(error)
     console.log(error)
