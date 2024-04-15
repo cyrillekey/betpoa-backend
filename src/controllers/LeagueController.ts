@@ -1,4 +1,5 @@
 import { Prisma } from '@prisma/client'
+import dayjs from 'dayjs'
 
 import { IDefaultQueryResponse, LeaguesQueryParams } from './interface/fixtures'
 import { BaseController } from './BaseController'
@@ -34,12 +35,25 @@ class LeagueController extends BaseController {
         where,
         skip,
         take,
+        include: {
+          _count: {
+            select: {
+              fixtures: {
+                where: {
+                  date: {
+                    gte: dayjs().toDate(),
+                  },
+                },
+              },
+            },
+          },
+        },
       })
       return this.res.status(200).send(<IDefaultQueryResponse>{
         id: null,
         success: true,
         message: 'Success',
-        data: leagues,
+        data: leagues.map((a) => ({ ...a, matches: a?._count?.fixtures })),
       })
     } catch (error) {
       this.app.log.error(error)

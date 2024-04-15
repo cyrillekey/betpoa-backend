@@ -12,7 +12,15 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
+model Markets {
+  id Int @default(autoincrement()) @id
+  name  String
+  type  String
+  logo  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("markets")
+}
 model User {
   id             Int           @id @default(autoincrement())
   phone          String        @unique
