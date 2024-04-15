@@ -110,7 +110,7 @@ export const getFixturesResults = async (app: FastifyInstance) => {
       schedule: {
         // Specify your schedule options here
         type: 'crontab',
-        value: '40 * * * *',
+        value: '*/20 * * * *',
       },
       checkinMargin: 1,
       maxRuntime: 10,
@@ -118,47 +118,14 @@ export const getFixturesResults = async (app: FastifyInstance) => {
     },
   )
   try {
-    const resultsToday = await getUpcomingFixtures(dayjs().toDate())
-    const fixtureIds = resultsToday.map((a) => a?.fixture?.id)
-    const results = await app.prisma.fixtureResult.findMany({
-      where: {
-        fixture: {
-          fixtureId: {
-            in: fixtureIds,
-          },
-        },
-      },
-      select: {
-        fixture: {
-          select: {
-            fixtureId: true,
-            id: true,
-          },
-        },
-      },
-    })
-    for (let index = 0; index < results.length; index++) {
-      const result = resultsToday.find((a) => a?.fixture?.id == results[index]?.fixture?.fixtureId)
-      await app.prisma.fixtureResult.update({
-        where: {
-          fixtureId: results[index]?.fixture?.id,
-        },
-        data: {
-          awayGoals: result?.score?.fulltime?.away,
-          homeGoals: result?.score?.fulltime?.home,
-          extraAwayGoals: result?.score?.extratime?.away,
-          extraHomeGoals: result?.score?.extratime?.home,
-          htAwayGoals: result?.score?.halftime?.away,
-          htHomeGoals: result?.score?.halftime?.home,
-          fixture: {
-            update: {
-              status: getFixtureStatus(result?.fixture?.status?.short ?? 'NP'),
-              shortStatus: result?.fixture?.status?.short,
-            },
-          },
-        },
-      })
-    }
+    // get results today
+    await generateResults(app, dayjs().toDate())
+    // get results for last night if cronjob runs a few minutes past midnight
+
+    const endDate = dayjs().startOf('day').add(150, 'minutes').toDate()
+    if (dayjs().isBefore(endDate)) {
+      await generateResults(app, dayjs().subtract(1, 'day').toDate())
+    } //
   } catch (error) {
     app.Sentry.captureException(error)
     console.log(error)
@@ -193,5 +160,48 @@ const getFixtureStatus = (status: string): MATCHSTATUS => {
       return 'ABANDONED'
     default:
       return 'CANCELLED'
+  }
+}
+async function generateResults(app: FastifyInstance, date: Date) {
+  const resultsToday = await getUpcomingFixtures(date)
+  const fixtureIds = resultsToday.map((a) => a?.fixture?.id)
+  const results = await app.prisma.fixtureResult.findMany({
+    where: {
+      fixture: {
+        fixtureId: {
+          in: fixtureIds,
+        },
+      },
+    },
+    select: {
+      fixture: {
+        select: {
+          fixtureId: true,
+          id: true,
+        },
+      },
+    },
+  })
+  for (let index = 0; index < results.length; index++) {
+    const result = resultsToday.find((a) => a?.fixture?.id == results[index]?.fixture?.fixtureId)
+    await app.prisma.fixtureResult.update({
+      where: {
+        fixtureId: results[index]?.fixture?.id,
+      },
+      data: {
+        awayGoals: result?.score?.fulltime?.away,
+        homeGoals: result?.score?.fulltime?.home,
+        extraAwayGoals: result?.score?.extratime?.away,
+        extraHomeGoals: result?.score?.extratime?.home,
+        htAwayGoals: result?.score?.halftime?.away,
+        htHomeGoals: result?.score?.halftime?.home,
+        fixture: {
+          update: {
+            status: getFixtureStatus(result?.fixture?.status?.short ?? 'NP'),
+            shortStatus: result?.fixture?.status?.short,
+          },
+        },
+      },
+    })
   }
 }
