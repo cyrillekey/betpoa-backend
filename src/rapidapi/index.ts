@@ -41,7 +41,10 @@ export async function getUpcomingFixtures(date: Date): Promise<IFixture[]> {
       },
     }
     const response = await axios(config)
-      .then((resp) => resp?.data?.response)
+      .then((resp) => {
+        console.log(resp?.data)
+        return resp?.data?.response
+      })
       .catch(() => [])
     return response
   } catch (error) {
