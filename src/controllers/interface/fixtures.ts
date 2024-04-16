@@ -46,6 +46,7 @@ export const ILeagueResponseBody = {
   logo: { type: 'string' },
   type: { type: 'string' },
   country: { type: 'string' },
+  matches: { type: 'number' },
   season: { type: 'string' },
   createdAt: { type: 'string' },
   updatedAt: { type: 'string' },

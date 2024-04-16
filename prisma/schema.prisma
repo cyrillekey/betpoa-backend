@@ -12,7 +12,16 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
+model Markets {
+  id Int @default(autoincrement()) @id
+  name  String
+  type  String
+  logo  String?
+  leagues League [] @relation()
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("markets")
+}
 model User {
   id             Int           @id @default(autoincrement())
   phone          String        @unique
@@ -109,6 +118,8 @@ model League {
   type      String
   country   String
   season    String
+  market    Markets @relation(fields: [marketId],references: [id],onDelete: Cascade)
+  marketId  Int @default(1)
   fixtures  Fixture[] @relation()
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

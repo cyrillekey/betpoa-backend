@@ -82,7 +82,7 @@ export async function getDateOdds(date: Date, page: number = 1): Promise<OddsApi
         'X-RapidAPI-Key': configs.rapidApiKey,
         'X-RapidAPI-Host': configs.rapidApiHost,
       },
-      params: { date: dayjs(date).format('YYYY-MM-DD'), bookmaker: 8, page },
+      params: { date: dayjs(date).format('YYYY-MM-DD'), bookmaker: 11, page },
     }
     const odds = await axios(config)
       .then((resp) => {

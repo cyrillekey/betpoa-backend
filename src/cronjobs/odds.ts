@@ -49,17 +49,24 @@ export const getFixturesOdds = async (app: FastifyInstance) => {
 const saveOddsToDatabase = async (app: FastifyInstance, odds: Odds[]) => {
   try {
     if (odds.length > 0) {
-      const fixtures = await app.prisma.fixture.findMany({
-        select: {
-          fixtureId: true,
-          id: true,
-        },
-        where: {
-          fixtureId: {
-            in: odds.map((a) => a?.fixture?.id),
+      const fixtures = (
+        await app.prisma.fixture.findMany({
+          select: {
+            fixtureId: true,
+            id: true,
+            _count: {
+              select: {
+                odds: true,
+              },
+            },
           },
-        },
-      })
+          where: {
+            fixtureId: {
+              in: odds.map((a) => a?.fixture?.id),
+            },
+          },
+        })
+      ).filter((a) => a?._count?.odds == 0)
       const transaction: Prisma.OddsCreateManyInput[] = []
       fixtures.forEach((fixture) => {
         const markets = odds.find((a) => a?.fixture?.id == fixture?.fixtureId)?.bookmakers?.at(0)?.bets
