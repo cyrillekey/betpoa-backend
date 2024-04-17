@@ -117,6 +117,7 @@ model League {
   type      String
   country   String
   season    String
+  featured  Boolean    @default(false)
   fixtures  Fixture[] @relation()
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -144,6 +145,7 @@ model Fixture {
   fixtureId     Int            @unique
   date          DateTime
   referee       String
+  featured      Boolean        @default(false)
   status        MATCHSTATUS
   league        League         @relation(fields: [leagueId], references: [id], onDelete: Cascade)
   leagueId      Int
