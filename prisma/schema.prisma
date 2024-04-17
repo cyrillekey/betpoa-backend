@@ -17,6 +17,7 @@ model Markets {
   name  String
   type  String
   logo  String?
+  leagues League [] @relation()
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("markets")
@@ -118,6 +119,8 @@ model League {
   country   String
   season    String
   featured  Boolean    @default(false)
+  market    Markets @relation(fields: [marketId],references: [id],onDelete: Cascade)
+  marketId  Int @default(1)
   fixtures  Fixture[] @relation()
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
