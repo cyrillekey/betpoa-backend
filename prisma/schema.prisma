@@ -118,6 +118,7 @@ model League {
   type      String
   country   String
   season    String
+  featured  Boolean    @default(false)
   market    Markets @relation(fields: [marketId],references: [id],onDelete: Cascade)
   marketId  Int @default(1)
   fixtures  Fixture[] @relation()
@@ -147,6 +148,7 @@ model Fixture {
   fixtureId     Int            @unique
   date          DateTime
   referee       String
+  featured      Boolean        @default(false)
   status        MATCHSTATUS
   league        League         @relation(fields: [leagueId], references: [id], onDelete: Cascade)
   leagueId      Int
