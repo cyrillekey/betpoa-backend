@@ -159,7 +159,7 @@ model Fixture {
   fixtureResult FIXTURERESULT  @default(NP)
   result        FixtureResult? @relation()
   odds          Odds []          @relation()
-  shortStatus   String
+  shortStatus   String  
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 

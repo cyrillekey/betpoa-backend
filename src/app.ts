@@ -61,6 +61,10 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
           description:
             'Betpoa match fixtures for past and upcoming fixtures as well as fixture results and fixture odds.\n All fixtures and odds are updated everyday at midnight and future fixtures are available upto 3 days',
         },
+        {
+          name: 'Admin',
+          description: `Administrative endpoints for managing the system,users,bets and all administrative task associated with ${configs.appname}`,
+        },
       ],
       servers: [
         {
