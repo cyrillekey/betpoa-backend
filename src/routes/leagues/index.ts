@@ -16,6 +16,7 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
         page: { type: 'number' },
         year: { type: 'string' },
         country: { type: 'string' },
+        featured: { type: 'boolean' },
       },
       response: {
         default: {

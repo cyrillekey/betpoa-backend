@@ -42,6 +42,45 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
       return await new FixturesController(fastify, request, reply).getAllFixtures()
     },
   )
+  fastify.get(
+    '/betting',
+    {
+      schema: {
+        summary: 'Get all fixtures for betting',
+        tags: ['Fixture'],
+        description: 'Betting Fixtures',
+        response: {
+          default: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              data: {
+                type: 'array',
+                items: {
+                  properties: FixtureResponse,
+                },
+              },
+            },
+          },
+        },
+        querystring: {
+          fromDate: { type: 'string' },
+          toDate: { type: 'string' },
+          pageSize: { type: 'number' },
+          page: { type: 'number' },
+          leagueIds: { type: 'string', description: 'League ids separated by dash. E.g 1-2-3-4' },
+          country: { type: 'string' },
+          teamsId: { type: 'string', description: 'Team ids separated by dash. E.g 1-2-3-4' },
+          status: { type: 'string', enum: ['FINISHED', 'UPCOMMING', 'ABANDONED', 'INPLAY', 'CANCELLED'] },
+        },
+      },
+    },
+    async (request, reply) => {
+      return await new FixturesController(fastify, request, reply).getAllBettingFixtures()
+    },
+  )
   fastify.route({
     method: 'GET',
     url: '/:id',

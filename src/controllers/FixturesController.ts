@@ -12,6 +12,150 @@ class FixturesController extends BaseController {
       const where: Prisma.FixtureWhereInput = {
         AND: [
           {
+            date: {
+              gte: dayjs().subtract(90, 'minutes').toDate(),
+            },
+          },
+        ],
+      }
+      if (body?.fromDate) {
+        where.AND = [
+          ...(where.AND as []),
+          {
+            date: {
+              gte: dayjs(body?.fromDate).toDate(),
+            },
+          },
+        ]
+      }
+      if (body?.toDate) {
+        where.AND = [
+          ...(where.AND as []),
+          {
+            date: {
+              lte: dayjs(body?.fromDate).toDate(),
+            },
+          },
+        ]
+      }
+      if (body?.country)
+        where.AND = [
+          ...(where.AND as []),
+          {
+            league: {
+              country: {
+                equals: body.country,
+                mode: 'insensitive',
+              },
+            },
+          },
+        ]
+      if (body?.status) {
+        where.AND = [
+          ...(where.AND as []),
+          {
+            status: body.status,
+          },
+        ]
+      }
+      if (body?.leagueIds) {
+        const ids = body.leagueIds.split('-').reduce((total, a) => {
+          try {
+            const number = Number(a)
+            if (isNaN(number)) {
+              return total
+            } else {
+              total.push(number)
+              return total
+            }
+          } catch (error) {
+            return total
+          }
+        }, [] as number[])
+        if (ids?.length > 0) {
+          where.AND = [
+            ...(where.AND as []),
+            {
+              leagueId: {
+                in: ids,
+              },
+            },
+          ]
+        }
+      }
+      if (body?.teamsIds) {
+        const ids = body.teamsIds.split('-').reduce((total, a) => {
+          try {
+            const number = Number(a)
+            if (isNaN(number)) {
+              return total
+            } else {
+              total.push(number)
+              return total
+            }
+          } catch (error) {
+            return total
+          }
+        }, [] as number[])
+        if (ids?.length > 0) {
+          where.AND = [
+            ...(where.AND as []),
+            {
+              OR: [
+                {
+                  homeTeamId: {
+                    in: ids,
+                  },
+                },
+                {
+                  awayTeamId: {
+                    in: ids,
+                  },
+                },
+              ],
+            },
+          ]
+        }
+      }
+      const take: number = isNaN(Number(body?.pageSize)) ? 100 : Number(body?.pageSize)
+      const skip: number = isNaN((Number(body?.page) ?? 0) * take) ? 0 : (Number(body?.page) ?? 0) * take
+      const fixtures = await this.app.prisma.fixture.findMany({
+        where: where,
+        take,
+        skip,
+        include: {
+          homeTeam: true,
+          awayTeam: true,
+          league: true,
+          result: true,
+        },
+      })
+
+      return this.res.send(<IDefaultQueryResponse>{
+        id: null,
+        success: true,
+        message: 'Success',
+        data: fixtures,
+      })
+    } catch (error) {
+      this.app.Sentry.captureException(error)
+      this.app.log.error(error)
+      return this.res.status(500).send(<IDefaultQueryResponse>{
+        id: null,
+        success: false,
+        message: 'Error! Something went wrong please try again',
+        data: [],
+      })
+    }
+  }
+
+  async getAllBettingFixtures() {
+    try {
+      const body = this.req.query as FixturesQueryParams
+
+      const where: Prisma.FixtureWhereInput = {
+        AND: [
+          {
             odds: {
               some: {},
             },

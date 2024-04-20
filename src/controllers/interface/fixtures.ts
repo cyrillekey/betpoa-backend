@@ -23,6 +23,7 @@ export interface LeaguesQueryParams {
   page?: number
   year?: string
   country?: string
+  featured?: boolean
 }
 export interface FixturesQueryParams {
   fromDate?: string

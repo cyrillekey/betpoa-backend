@@ -26,6 +26,19 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
       app.log.info(`Genetating fixtures for ${dayjs().add(index, 'day').toDate()}`)
       try {
         const fixtures = await getUpcomingFixtures(dayjs().add(index, 'day').toDate())
+        const leagues = fixtures.map((a) => a?.league)
+        await app.prisma.league.createMany({
+          skipDuplicates: true,
+          data: leagues.map((a) => ({
+            country: a?.name,
+            leagueId: a?.id,
+            logo: a?.logo,
+            name: a?.name,
+            type: a?.type,
+            season: new Date().getFullYear().toString(),
+            id: a?.id,
+          })),
+        })
         const allTeams = fixtures
           .map((a) => {
             if (a?.teams?.home && a?.teams?.away) return [a?.teams?.away, a?.teams.home]
