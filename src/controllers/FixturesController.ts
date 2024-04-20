@@ -380,5 +380,42 @@ class FixturesController extends BaseController {
       })
     }
   }
+  async getFixturedMatch() {
+    try {
+      const fixture = await this.app.prisma.fixture.findFirst({
+        include: {
+          odds: true,
+          league: true,
+          awayTeam: true,
+          homeTeam: true,
+          result: true,
+        },
+        where: {
+          odds: {
+            some: {},
+          },
+          featured: true,
+          date: {
+            gte: dayjs().toDate(),
+          },
+        },
+      })
+
+      return this.res.send(<IDefaultQueryResponse>{
+        id: null,
+        data: fixture,
+        success: true,
+        message: 'Success',
+      })
+    } catch (error) {
+      this.app.Sentry.captureException(error)
+      return this.res.status(500).send(<IDefaultQueryResponse>{
+        id: null,
+        success: false,
+        message: 'Error! Something went wrong please try again',
+        data: null,
+      })
+    }
+  }
 }
 export default FixturesController

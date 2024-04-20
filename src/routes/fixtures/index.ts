@@ -164,6 +164,16 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
     },
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixtureoddsById(),
   })
+  fastify.route({
+    method: 'GET',
+    url: '/featured',
+    schema: {
+      tags: ['Fixtures'],
+      summary: 'Featured Match',
+      description: 'Get a featured match with odds from a featured league that is upcoming',
+    },
+    handler: async (req, res) => new FixturesController(fastify, req, res).getFixturedMatch(),
+  })
 }
 
 export default fixturesQueries
