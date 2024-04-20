@@ -32,8 +32,8 @@ class LeagueController extends BaseController {
         where.AND = [
           ...(where.AND as []),
           {
-            
-          }
+            featured: queryParams.featured,
+          },
         ]
       }
       const take: number = Number(queryParams?.pageSize) ?? 100
