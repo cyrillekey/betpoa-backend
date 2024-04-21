@@ -1,4 +1,4 @@
-import { IErrorResponse, ILeagueResponseBody } from '@controllers/interface/response'
+import { ErrorResponses, ILeagueResponseBody } from '@controllers/interface/response'
 import LeagueController from '@controllers/LeagueController'
 import { isAuthorized } from '@hooks/Auth'
 import { FastifyPluginAsync } from 'fastify'
@@ -49,11 +49,7 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
             },
           },
         },
-        400: {
-          description: 'Bad Request',
-          type: 'Object',
-          properties: IErrorResponse,
-        },
+        ...ErrorResponses,
       },
     },
 
@@ -71,6 +67,19 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
         id: { type: 'number' },
       },
       response: {
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: ILeagueResponseBody,
+            },
+          },
+        },
         default: {
           description: 'Default response',
           type: 'object',
@@ -84,6 +93,7 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
             },
           },
         },
+        ...ErrorResponses,
       },
     },
     preHandler: isAuthorized,

@@ -129,3 +129,26 @@ export const IPlaceBetInput = {
   oddsId: { type: 'number' },
   pick: { type: 'string' },
 }
+
+export const ErrorResponses = {
+  400: {
+    description: 'Bad Request',
+    type: 'object',
+    properties: IErrorResponse,
+  },
+  401: {
+    description: 'Not Authorized',
+    type: 'object',
+    properties: IErrorResponse,
+  },
+  403: {
+    description: 'Not Authorized',
+    type: 'object',
+    properties: IErrorResponse,
+  },
+  500: {
+    description: 'Server error',
+    type: 'object',
+    properties: IErrorResponse,
+  },
+}

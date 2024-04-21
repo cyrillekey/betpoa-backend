@@ -1,5 +1,5 @@
 import FixturesController from '@controllers/FixturesController'
-import { FixtureResponse, IFixtureResults, IOdds } from '@controllers/interface/response'
+import { ErrorResponses, FixtureResponse, IFixtureResults, IOdds } from '@controllers/interface/response'
 import { FastifyPluginAsync } from 'fastify'
 
 const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
@@ -11,6 +11,20 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
         tags: ['Fixture'],
         description: 'Get all fixtures',
         response: {
+          200: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              data: {
+                type: 'array',
+                items: {
+                  properties: FixtureResponse,
+                },
+              },
+            },
+          },
           default: {
             type: 'object',
             properties: {
@@ -25,6 +39,7 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
               },
             },
           },
+          ...ErrorResponses,
         },
         querystring: {
           fromDate: { type: 'string' },
@@ -64,6 +79,21 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
               },
             },
           },
+          200: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              data: {
+                type: 'array',
+                items: {
+                  properties: FixtureResponse,
+                },
+              },
+            },
+          },
+          ...ErrorResponses,
         },
         querystring: {
           fromDate: { type: 'string' },
@@ -106,6 +136,19 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             },
           },
         },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: FixtureResponse,
+            },
+          },
+        },
+        ...ErrorResponses,
       },
     },
   })
@@ -132,6 +175,19 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             },
           },
         },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: IFixtureResults,
+            },
+          },
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixtureResultByFixtureId(),
@@ -160,6 +216,19 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             },
           },
         },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'array',
+              items: { properties: IOdds },
+            },
+          },
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixtureoddsById(),
@@ -196,6 +265,7 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             },
           },
         },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixturedMatch(),
