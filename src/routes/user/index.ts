@@ -1,5 +1,6 @@
 import { configs } from '@configs/index'
 import { IDefaultResponse } from '@controllers/interface/fixtures'
+import { ErrorResponses } from '@controllers/interface/response'
 import { ISignUpBody, IValidateOptBody } from '@controllers/interface/user'
 import { UserController } from '@controllers/UserController'
 import { isAuthorized } from '@hooks/Auth'
@@ -31,6 +32,17 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
             id: { type: 'number' },
             success: { type: 'boolean' },
             message: { type: 'string' },
+            token: { type: 'string' },
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                phone: { type: 'string' },
+                phoneValidated: { type: 'boolean' },
+                profileId: { type: 'number' },
+                role: { type: 'string' },
+              },
+            },
           },
         },
         default: {
@@ -42,6 +54,7 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
             message: { type: 'string' },
           },
         },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => {
@@ -93,6 +106,7 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
             message: { type: 'string' },
           },
         },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => {
@@ -109,6 +123,27 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
       summary: 'Request Phone Otp',
       tags: ['Auth'],
       security: [{ bearerAuth: [] }],
+      response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        ...ErrorResponses,
+      },
     },
     handler: async (req, res) => new UserController(fastify, req, res).requestPhoneOtp(),
   })
@@ -127,6 +162,27 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
           otp: { type: 'string' },
         },
       },
+      response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        ...ErrorResponses,
+      },
       security: [{ bearerAuth: [] }],
     },
     handler: async (req, res) => new UserController(fastify, req, res).validateOtp(),
@@ -144,6 +200,27 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
         properties: {
           phone: { type: 'string' },
         },
+      },
+      response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => new UserController(fastify, req, res).requestPasswordReset(),
@@ -167,6 +244,27 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
           avatar: { type: 'object', properties: { link: { type: 'string' }, filename: { type: 'string' }, fileType: { type: 'string' } } },
         },
       },
+      response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        ...ErrorResponses,
+      },
     },
     handler: async (req, res) => new UserController(fastify, req, res).updateUser(),
   })
@@ -185,6 +283,27 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
           password: { type: 'string', description: 'New Password' },
           phone: { type: 'string', description: 'User Phone Number' },
         },
+      },
+      response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => new UserController(fastify, req, res).updateUserPassword(),
@@ -208,7 +327,18 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
             message: { type: 'string' },
           },
         },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        ...ErrorResponses,
       },
+
       body: {
         type: 'object',
         required: ['phone', 'amount'],
@@ -230,6 +360,15 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
       description: 'Customer make mpesa withdrawal',
       security: [{ bearerAuth: [] }],
       response: {
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
         default: {
           description: 'Default response',
           type: 'object',
@@ -239,6 +378,7 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
             message: { type: 'string' },
           },
         },
+        ...ErrorResponses,
       },
       body: {
         type: 'object',

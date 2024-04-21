@@ -1,5 +1,5 @@
 import FixturesController from '@controllers/FixturesController'
-import { FixtureResponse, IFixtureResults } from '@controllers/interface/fixtures'
+import { ErrorResponses, FixtureResponse, IFixtureResults, IOdds } from '@controllers/interface/response'
 import { FastifyPluginAsync } from 'fastify'
 
 const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
@@ -11,6 +11,20 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
         tags: ['Fixture'],
         description: 'Get all fixtures',
         response: {
+          200: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              data: {
+                type: 'array',
+                items: {
+                  properties: FixtureResponse,
+                },
+              },
+            },
+          },
           default: {
             type: 'object',
             properties: {
@@ -25,6 +39,7 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
               },
             },
           },
+          ...ErrorResponses,
         },
         querystring: {
           fromDate: { type: 'string' },
@@ -40,6 +55,60 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
     },
     async (request, reply) => {
       return await new FixturesController(fastify, request, reply).getAllFixtures()
+    },
+  )
+  fastify.get(
+    '/betting',
+    {
+      schema: {
+        summary: 'Get all fixtures for betting',
+        tags: ['Fixture'],
+        description: 'Betting Fixtures',
+        response: {
+          default: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              data: {
+                type: 'array',
+                items: {
+                  properties: FixtureResponse,
+                },
+              },
+            },
+          },
+          200: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              success: { type: 'boolean' },
+              message: { type: 'string' },
+              data: {
+                type: 'array',
+                items: {
+                  properties: FixtureResponse,
+                },
+              },
+            },
+          },
+          ...ErrorResponses,
+        },
+        querystring: {
+          fromDate: { type: 'string' },
+          toDate: { type: 'string' },
+          pageSize: { type: 'number' },
+          page: { type: 'number' },
+          leagueIds: { type: 'string', description: 'League ids separated by dash. E.g 1-2-3-4' },
+          country: { type: 'string' },
+          teamsId: { type: 'string', description: 'Team ids separated by dash. E.g 1-2-3-4' },
+          status: { type: 'string', enum: ['FINISHED', 'UPCOMMING', 'ABANDONED', 'INPLAY', 'CANCELLED'] },
+        },
+      },
+    },
+    async (request, reply) => {
+      return await new FixturesController(fastify, request, reply).getAllBettingFixtures()
     },
   )
   fastify.route({
@@ -67,6 +136,19 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             },
           },
         },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: FixtureResponse,
+            },
+          },
+        },
+        ...ErrorResponses,
       },
     },
   })
@@ -93,6 +175,19 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             },
           },
         },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: IFixtureResults,
+            },
+          },
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixtureResultByFixtureId(),
@@ -117,13 +212,63 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             message: { type: 'string' },
             data: {
               type: 'array',
-              items: { properties: IFixtureResults },
+              items: { properties: IOdds },
             },
           },
         },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'array',
+              items: { properties: IOdds },
+            },
+          },
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixtureoddsById(),
+  })
+  fastify.route({
+    method: 'GET',
+    url: '/featured',
+    schema: {
+      tags: ['Fixture'],
+      summary: 'Featured Match',
+      description: 'Get a featured match with odds from a featured league that is upcoming',
+      response: {
+        default: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: FixtureResponse,
+            },
+          },
+        },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: FixtureResponse,
+            },
+          },
+        },
+        ...ErrorResponses,
+      },
+    },
+    handler: async (req, res) => new FixturesController(fastify, req, res).getFeaturedMatch(),
   })
 }
 

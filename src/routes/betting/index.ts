@@ -1,5 +1,5 @@
 import BettingController from '@controllers/BettingController'
-import { IPlaceBetInput } from '@controllers/interface/fixtures'
+import { BetMarketOddsReponse, BetResponseBody, ErrorResponses, IPlaceBetInput, ISuccessResponse } from '@controllers/interface/response'
 import { isAuthorized } from '@hooks/Auth'
 import { BETSTATUS } from '@prisma/client'
 import { FastifyPluginAsync } from 'fastify'
@@ -26,6 +26,19 @@ const bettingRoute: FastifyPluginAsync = async (fastify): Promise<void> => {
           },
         },
       },
+      response: {
+        200: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: ISuccessResponse,
+        },
+        default: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: ISuccessResponse,
+        },
+        ...ErrorResponses,
+      },
     },
     handler: async (req, res) => await new BettingController(fastify, req, res).placeBet(),
   })
@@ -39,6 +52,19 @@ const bettingRoute: FastifyPluginAsync = async (fastify): Promise<void> => {
       tags: ['Bet'],
       params: {
         id: { type: 'number' },
+      },
+      response: {
+        200: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: ISuccessResponse,
+        },
+        default: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: ISuccessResponse,
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => await new BettingController(fastify, req, res).cancelBet(),
@@ -57,6 +83,19 @@ const bettingRoute: FastifyPluginAsync = async (fastify): Promise<void> => {
         status: { type: 'array', items: { type: 'string', enum: ['WON', 'LOST', 'VOID', 'PENDING', 'CANCELLED'] satisfies BETSTATUS[] } },
       },
       security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: { ...ISuccessResponse, data: { type: 'array', items: { type: 'object', properties: BetResponseBody } } },
+        },
+        default: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: { ...ISuccessResponse, data: { type: 'array', items: { type: 'object', properties: BetResponseBody } } },
+        },
+        ...ErrorResponses,
+      },
     },
     handler: async (req, res) => await new BettingController(fastify, req, res).getGets(),
   })
@@ -72,6 +111,19 @@ const bettingRoute: FastifyPluginAsync = async (fastify): Promise<void> => {
         id: { type: 'number' },
       },
       security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: { ...ISuccessResponse, data: { type: 'object', properties: BetResponseBody } },
+        },
+        default: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: { ...ISuccessResponse, data: { type: 'object', properties: BetResponseBody } },
+        },
+        ...ErrorResponses,
+      },
     },
     handler: async (req, res) => await new BettingController(fastify, req, res).getBet(),
   })
@@ -86,6 +138,19 @@ const bettingRoute: FastifyPluginAsync = async (fastify): Promise<void> => {
       security: [{ bearerAuth: [] }],
       params: {
         id: { type: 'number' },
+      },
+      response: {
+        200: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: { ...ISuccessResponse, data: { type: 'array', items: { type: 'object', properties: BetMarketOddsReponse } } },
+        },
+        default: {
+          type: 'object',
+          description: 'SuccessReponse',
+          properties: { ...ISuccessResponse, data: { type: 'array', items: { type: 'object', properties: BetMarketOddsReponse } } },
+        },
+        ...ErrorResponses,
       },
     },
     handler: async (req, res) => await new BettingController(fastify, req, res).getBetItems(),

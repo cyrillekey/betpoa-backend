@@ -28,6 +28,14 @@ class LeagueController extends BaseController {
           },
         ]
       }
+      if (queryParams?.featured) {
+        where.AND = [
+          ...(where.AND as []),
+          {
+            featured: queryParams.featured,
+          },
+        ]
+      }
       const take: number = Number(queryParams?.pageSize) ?? 100
       const skip: number = isNaN((Number(queryParams?.page) ?? 0) * take) ? 0 : (Number(queryParams?.page) ?? 0) * take
 
