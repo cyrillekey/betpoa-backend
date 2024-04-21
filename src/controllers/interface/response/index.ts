@@ -89,7 +89,7 @@ export const ITeamResponse = {
 export const IOdds = {
   id: { type: 'number' },
   name: { type: 'string' },
-  value: { type: 'number', default: 1.0 },
+  value: { type: ['number', 'string'] },
   odd: { type: 'number', default: 1.0 },
   type: { type: 'string', enum: [''] },
   fixtureId: { type: 'string' },

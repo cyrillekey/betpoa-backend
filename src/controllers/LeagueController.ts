@@ -8,7 +8,6 @@ class LeagueController extends BaseController {
   async getAllLeagues() {
     try {
       const queryParams: LeaguesQueryParams = this.req.query as LeaguesQueryParams
-      console.log(queryParams)
       const where: Prisma.LeagueWhereInput = {
         AND: [],
       }
@@ -82,7 +81,7 @@ class LeagueController extends BaseController {
           id,
         },
       })
-      console.log(league)
+
       return this.res.status(200).send(<IDefaultQueryResponse>{
         id: null,
         success: true,

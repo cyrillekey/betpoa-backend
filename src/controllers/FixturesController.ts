@@ -384,7 +384,11 @@ class FixturesController extends BaseController {
     try {
       const fixture = await this.app.prisma.fixture.findFirst({
         include: {
-          odds: true,
+          odds: {
+            where: {
+              type: 'WINNER_FT',
+            },
+          },
           league: true,
           awayTeam: true,
           homeTeam: true,

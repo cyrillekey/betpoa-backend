@@ -141,7 +141,7 @@ export const getFixturesResults = async (app: FastifyInstance) => {
     } //
   } catch (error) {
     app.Sentry.captureException(error)
-    console.log(error)
+
     app.Sentry.captureCheckIn({ checkInId, monitorSlug: 'fixtures_result_cron', status: 'error' })
   }
 }
