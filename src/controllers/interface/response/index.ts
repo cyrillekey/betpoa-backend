@@ -146,6 +146,11 @@ export const ErrorResponses = {
     type: 'object',
     properties: IErrorResponse,
   },
+  404: {
+    description: 'Not Authorized',
+    type: 'object',
+    properties: IErrorResponse,
+  },
   500: {
     description: 'Server error',
     type: 'object',

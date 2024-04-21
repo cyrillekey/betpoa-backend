@@ -380,7 +380,7 @@ class FixturesController extends BaseController {
       })
     }
   }
-  async getFixturedMatch() {
+  async getFeaturedMatch() {
     try {
       const fixture = await this.app.prisma.fixture.findFirst({
         include: {

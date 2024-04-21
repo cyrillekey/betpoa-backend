@@ -32,6 +32,17 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
             id: { type: 'number' },
             success: { type: 'boolean' },
             message: { type: 'string' },
+            token: { type: 'string' },
+            user: {
+              type: 'object',
+              properties: {
+                id: { type: 'number' },
+                phone: { type: 'string' },
+                phoneValidated: { type: 'boolean' },
+                profileId: { type: 'number' },
+                role: { type: 'string' },
+              },
+            },
           },
         },
         default: {
@@ -113,6 +124,24 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
       tags: ['Auth'],
       security: [{ bearerAuth: [] }],
       response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
         ...ErrorResponses,
       },
     },
@@ -134,6 +163,24 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
         },
       },
       response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
         ...ErrorResponses,
       },
       security: [{ bearerAuth: [] }],
@@ -155,6 +202,24 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
         },
       },
       response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
         ...ErrorResponses,
       },
     },
@@ -180,6 +245,24 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
         },
       },
       response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
         ...ErrorResponses,
       },
     },
@@ -202,6 +285,24 @@ const userRoutes: FastifyPluginAsync = async (fastify, _opts): Promise<void> => 
         },
       },
       response: {
+        default: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
+        200: {
+          description: 'Default response',
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+          },
+        },
         ...ErrorResponses,
       },
     },

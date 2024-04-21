@@ -237,7 +237,7 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
     method: 'GET',
     url: '/featured',
     schema: {
-      tags: ['Fixtures'],
+      tags: ['Fixture'],
       summary: 'Featured Match',
       description: 'Get a featured match with odds from a featured league that is upcoming',
       response: {
@@ -268,7 +268,7 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
         ...ErrorResponses,
       },
     },
-    handler: async (req, res) => new FixturesController(fastify, req, res).getFixturedMatch(),
+    handler: async (req, res) => new FixturesController(fastify, req, res).getFeaturedMatch(),
   })
 }
 
