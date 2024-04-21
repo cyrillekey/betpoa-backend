@@ -1,5 +1,5 @@
 import FixturesController from '@controllers/FixturesController'
-import { FixtureResponse, IFixtureResults } from '@controllers/interface/fixtures'
+import { FixtureResponse, IFixtureResults, IOdds } from '@controllers/interface/response'
 import { FastifyPluginAsync } from 'fastify'
 
 const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void> => {
@@ -156,7 +156,7 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
             message: { type: 'string' },
             data: {
               type: 'array',
-              items: { properties: IFixtureResults },
+              items: { properties: IOdds },
             },
           },
         },
@@ -171,6 +171,32 @@ const fixturesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void
       tags: ['Fixtures'],
       summary: 'Featured Match',
       description: 'Get a featured match with odds from a featured league that is upcoming',
+      response: {
+        default: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: FixtureResponse,
+            },
+          },
+        },
+        200: {
+          type: 'object',
+          properties: {
+            id: { type: 'number' },
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: {
+              type: 'object',
+              properties: FixtureResponse,
+            },
+          },
+        },
+      },
     },
     handler: async (req, res) => new FixturesController(fastify, req, res).getFixturedMatch(),
   })

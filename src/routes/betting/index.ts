@@ -1,5 +1,5 @@
 import BettingController from '@controllers/BettingController'
-import { IPlaceBetInput } from '@controllers/interface/fixtures'
+import { IPlaceBetInput } from '@controllers/interface/response'
 import { isAuthorized } from '@hooks/Auth'
 import { BETSTATUS } from '@prisma/client'
 import { FastifyPluginAsync } from 'fastify'

@@ -5,6 +5,11 @@ export const ISuccessResponse = {
   success: { type: 'boolean' },
   message: { type: 'string' },
 }
+export const IErrorResponse = {
+  id: { type: 'number' },
+  success: { type: 'boolean', default: false },
+  message: { type: 'string' },
+}
 export const IUserReponse = {
   id: { type: 'number' },
   phone: { type: 'string' },
