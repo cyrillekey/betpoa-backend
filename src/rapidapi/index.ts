@@ -72,7 +72,7 @@ export async function getFixtures(fixturesId: string[]): Promise<IFixture[]> {
   }
 }
 
-export async function getDateOdds(date: Date, page: number = 1): Promise<OddsApiResponse> {
+export async function getDateOdds(date: Date, page: number = 1, bookmaker: number): Promise<OddsApiResponse> {
   try {
     const config: AxiosRequestConfig = {
       method: 'GET',
@@ -81,7 +81,7 @@ export async function getDateOdds(date: Date, page: number = 1): Promise<OddsApi
         'X-RapidAPI-Key': configs.rapidApiKey,
         'X-RapidAPI-Host': configs.rapidApiHost,
       },
-      params: { date: dayjs(date).format('YYYY-MM-DD'), bookmaker: 11, page },
+      params: { date: dayjs(date).format('YYYY-MM-DD'), bookmaker, page },
     }
     const odds = await axios(config)
       .then((resp) => {

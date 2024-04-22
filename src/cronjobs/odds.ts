@@ -23,20 +23,24 @@ export const getFixturesOdds = async (app: FastifyInstance) => {
   )
   try {
     // get next three days odds
+    const bookmakers = [8, 11]
     app.log.info('Generating odds cronjob starting')
-    for (let index = 0; index < 3; index++) {
-      app.log.info(`Generating odds for ${dayjs().add(index, 'day').toDate()}`)
-      const oddsResponse = await getDateOdds(dayjs().add(index, 'day').toDate())
+    for (let x = 0; x < bookmakers.length; x++) {
+      for (let index = 0; index < 3; index++) {
+        app.log.info(`Generating odds for ${dayjs().add(index, 'day').toDate()}`)
+        const oddsResponse = await getDateOdds(dayjs().add(index, 'day').toDate(), 1, bookmakers[x])
 
-      await saveOddsToDatabase(app, oddsResponse?.odds)
-      if (oddsResponse?.hasNext) {
-        // loop through nex pages and get the data
-        for (let index = 2; index < oddsResponse.total - 1; index++) {
-          const nextOdds = await getDateOdds(dayjs().add(index, 'day').toDate(), index)
-          await saveOddsToDatabase(app, nextOdds?.odds)
+        await saveOddsToDatabase(app, oddsResponse?.odds)
+        if (oddsResponse?.hasNext) {
+          // loop through nex pages and get the data
+          for (let index = 2; index < oddsResponse.total - 1; index++) {
+            const nextOdds = await getDateOdds(dayjs().add(index, 'day').toDate(), index, bookmakers[x])
+            await saveOddsToDatabase(app, nextOdds?.odds)
+          }
         }
       }
     }
+
     app.log.info('Generating odds cronjob finished')
     app.Sentry.captureCheckIn({ checkInId, status: 'ok', monitorSlug: 'fixtures_odds_cron' })
   } catch (error) {
