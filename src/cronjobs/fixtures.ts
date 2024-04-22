@@ -34,7 +34,7 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
             leagueId: a?.id,
             logo: a?.logo,
             name: a?.name,
-            type: a?.type,
+            type: a?.type ?? a?.name,
             season: new Date().getFullYear().toString(),
             id: a?.id,
           })),
@@ -60,42 +60,72 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
             id: a?.id,
           })),
         })
-        const fixturesTransaction: any[] = [
-          app.prisma.fixture.createMany({
-            skipDuplicates: true,
-            data: fixtures
-              .filter((a) => a?.teams?.away && a?.teams?.home)
-              .map((a) => ({
-                fixtureId: a?.fixture?.id,
-                awayTeamId: a?.teams?.away?.id,
-                homeTeamId: a?.teams?.home?.id,
-                date: a?.fixture?.date,
-                leagueId: a?.league?.id,
-                referee: a?.fixture?.referee ?? 'N/A',
-                shortStatus: a?.fixture?.status?.short,
-                status: getFixtureStatus(a!.fixture!.status!.short!),
-              })),
-          }),
-          ...fixtures
+        await app.prisma.fixture.createMany({
+          skipDuplicates: true,
+          data: fixtures
             .filter((a) => a?.teams?.away && a?.teams?.home)
-            .map((a) =>
+            .map((a) => ({
+              fixtureId: a?.fixture?.id,
+              awayTeamId: a?.teams?.away?.id,
+              homeTeamId: a?.teams?.home?.id,
+              date: a?.fixture?.date,
+              leagueId: a?.league?.id,
+              referee: a?.fixture?.referee ?? 'N/A',
+              shortStatus: a?.fixture?.status?.short,
+              status: getFixtureStatus(a!.fixture!.status!.short!),
+            })),
+        })
+        const fixturesTransaction: any[] = []
+        const fixturesToCreate = fixtures.filter((a) => a?.teams?.away && a?.teams?.home)
+        for (let index = 0; index < fixturesToCreate.length; index++) {
+          const fixture = fixturesToCreate[index]
+          const fixtureResult = await app.prisma.fixtureResult
+            .findFirstOrThrow({
+              where: {
+                fixture: {
+                  fixtureId: fixture?.fixture?.id,
+                },
+              },
+            })
+            .then((resp) => resp?.id)
+            .catch(() => null)
+          if (fixtureResult == null) {
+            fixturesTransaction.push(
               app.prisma.fixtureResult.create({
                 data: {
-                  awayGoals: a?.score?.fulltime?.away,
-                  homeGoals: a?.score?.fulltime?.home,
-                  htAwayGoals: a?.score?.halftime?.away,
-                  htHomeGoals: a?.score?.halftime?.home,
-                  extraAwayGoals: a?.score?.extratime?.away,
-                  extraHomeGoals: a?.score?.extratime?.home,
+                  awayGoals: fixture?.score?.fulltime?.away,
+                  homeGoals: fixture?.score?.fulltime?.home,
+                  htAwayGoals: fixture?.score?.halftime?.away,
+                  htHomeGoals: fixture?.score?.halftime?.home,
+                  extraAwayGoals: fixture?.score?.extratime?.away ?? undefined,
+                  extraHomeGoals: fixture?.score?.extratime?.home ?? undefined,
                   fixture: {
                     connect: {
-                      fixtureId: a?.fixture?.id,
+                      fixtureId: fixture?.fixture?.id,
                     },
                   },
                 },
               }),
-            ),
-        ]
+            )
+          } else {
+            console.log(fixtureResult)
+            fixturesTransaction.push(
+              app.prisma.fixtureResult.update({
+                where: {
+                  id: fixtureResult!,
+                },
+                data: {
+                  awayGoals: fixture?.score?.fulltime?.away,
+                  homeGoals: fixture?.score?.fulltime?.home,
+                  htAwayGoals: fixture?.score?.halftime?.away,
+                  htHomeGoals: fixture?.score?.halftime?.home,
+                  extraAwayGoals: fixture?.score?.extratime?.away,
+                  extraHomeGoals: fixture?.score?.extratime?.home,
+                },
+              }),
+            )
+          }
+        }
 
         await app.prisma.$transaction(fixturesTransaction)
         app.log.info(`Genetating fixtures for ${dayjs().add(index, 'day').toDate()}`)
