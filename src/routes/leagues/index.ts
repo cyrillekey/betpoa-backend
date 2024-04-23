@@ -11,7 +11,7 @@ const leaguesQueries: FastifyPluginAsync = async (fastify, _opts): Promise<void>
       summary: 'Get Leagues',
       description: 'Get all active leagues',
       tags: ['League'],
-      params: {
+      querystring: {
         pageSize: { type: 'number' },
         page: { type: 'number' },
         year: { type: 'string' },

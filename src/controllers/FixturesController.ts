@@ -160,12 +160,24 @@ class FixturesController extends BaseController {
               some: {},
             },
           },
+        ],
+      }
+      if (body?.status && body.status == 'FINISHED') {
+        where.AND = [
+          ...(where.AND as []),
+          {
+            status: body?.status,
+          },
+        ]
+      } else {
+        where.AND = [
+          ...(where.AND as []),
           {
             date: {
               gte: dayjs().subtract(90, 'minutes').toDate(),
             },
           },
-        ],
+        ]
       }
       if (body?.fromDate) {
         where.AND = [
@@ -203,7 +215,7 @@ class FixturesController extends BaseController {
         where.AND = [
           ...(where.AND as []),
           {
-            status: body.status,
+            status: body?.status,
           },
         ]
       }
@@ -266,6 +278,7 @@ class FixturesController extends BaseController {
           ]
         }
       }
+      console.log(where)
       const take: number = isNaN(Number(body?.pageSize)) ? 100 : Number(body?.pageSize)
       const skip: number = isNaN((Number(body?.page) ?? 0) * take) ? 0 : (Number(body?.page) ?? 0) * take
       const fixtures = await this.app.prisma.fixture.findMany({
