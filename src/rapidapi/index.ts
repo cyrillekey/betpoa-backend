@@ -85,8 +85,6 @@ export async function getDateOdds(date: Date, page: number = 1): Promise<OddsApi
     }
     const odds = await axios(config)
       .then((resp) => {
-        console?.log(resp?.data?.paging)
-
         return <OddsApiResponse>{
           odds: resp?.data?.response,
           hasNext: resp?.data?.paging?.current == resp?.data?.paging?.total,

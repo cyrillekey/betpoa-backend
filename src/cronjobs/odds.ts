@@ -14,7 +14,7 @@ export const getFixturesOdds = async (app: FastifyInstance) => {
       schedule: {
         // Specify your schedule options here
         type: 'crontab',
-        value: '45 0 * * *',
+        value: '50 03 * * *',
       },
       checkinMargin: 1,
       maxRuntime: 10,
@@ -27,14 +27,16 @@ export const getFixturesOdds = async (app: FastifyInstance) => {
     for (let index = 0; index < 3; index++) {
       app.log.info(`Generating odds for ${dayjs().add(index, 'day').toDate()}`)
       const oddsResponse = await getDateOdds(dayjs().add(index, 'day').toDate())
+      app.log.info(`${dayjs().add(index, 'day').toDate()} has ${oddsResponse?.total}`)
 
       await saveOddsToDatabase(app, oddsResponse?.odds)
-      if (oddsResponse?.hasNext) {
-        // loop through nex pages and get the data
-        for (let index = 2; index < oddsResponse.total - 1; index++) {
-          const nextOdds = await getDateOdds(dayjs().add(index, 'day').toDate(), index)
-          await saveOddsToDatabase(app, nextOdds?.odds)
-        }
+
+      // loop through nex pages and get the data
+      for (let index = 2; index < oddsResponse.total + 1; index++) {
+        app.log.info(`Fetching for page ${index}`)
+        const nextOdds = await getDateOdds(dayjs().add(index, 'day').toDate(), index)
+        app.log.info(`${index} has ${nextOdds?.odds?.length} odds`)
+        await saveOddsToDatabase(app, nextOdds?.odds)
       }
     }
     app.log.info('Generating odds cronjob finished')

@@ -13,7 +13,7 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
       schedule: {
         // Specify your schedule options here
         type: 'crontab',
-        value: '30 00 * * *',
+        value: '30 03 * * *',
       },
       checkinMargin: 1,
       maxRuntime: 10,
