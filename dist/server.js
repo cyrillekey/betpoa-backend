@@ -26,16 +26,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("./app"));
 const dotenv = __importStar(require("dotenv"));
+const app_1 = __importDefault(require("./app"));
 dotenv.config();
-const fastify_1 = __importDefault(require("fastify"));
 const close_with_grace_1 = __importDefault(require("close-with-grace"));
+const fastify_1 = __importDefault(require("fastify"));
 const app = (0, fastify_1.default)({
     logger: true,
 });
 app.register(app_1.default);
-(0, close_with_grace_1.default)({ delay: parseInt(process.env.FASTIFY_CLOSE_GRACE_DELAY) || 500 }, async function ({ signal, err, manual }) {
+(0, close_with_grace_1.default)({ delay: parseInt(process.env.FASTIFY_CLOSE_GRACE_DELAY) || 500 }, async function ({ err }) {
     if (err) {
         app.log.error(err);
     }

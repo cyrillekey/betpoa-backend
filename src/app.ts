@@ -1,3 +1,5 @@
+import 'module-alias/register'
+
 import AutoLoad, { AutoloadPluginOptions } from '@fastify/autoload'
 import cors from '@fastify/cors'
 import swagger from '@fastify/swagger'

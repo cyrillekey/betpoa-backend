@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const configs_1 = require("../configs");
 const africastalking_1 = __importDefault(require("africastalking"));
 const axios_1 = __importDefault(require("axios"));
 const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
+const configs_1 = require("../configs");
 const sendSmsAfrikasTalking = async (fastify, phone, message) => {
     const atClient = (0, africastalking_1.default)({ apiKey: configs_1.configs.afrikasTalking.apiKey, username: configs_1.configs.afrikasTalking.username });
     const smsClient = atClient.SMS;

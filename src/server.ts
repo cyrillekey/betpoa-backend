@@ -1,5 +1,4 @@
 // Read the .env file.
-import 'module-alias/register'
 
 import * as dotenv from 'dotenv'
 
