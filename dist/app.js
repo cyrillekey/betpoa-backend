@@ -9,7 +9,6 @@ const autoload_1 = __importDefault(require("@fastify/autoload"));
 const cors_1 = __importDefault(require("@fastify/cors"));
 const swagger_1 = __importDefault(require("@fastify/swagger"));
 const fastify_sentry_1 = __importDefault(require("@immobiliarelabs/fastify-sentry"));
-const fastify_api_reference_1 = __importDefault(require("@scalar/fastify-api-reference"));
 const profiling_node_1 = require("@sentry/profiling-node");
 const path_1 = require("path");
 const configs_1 = require("./configs");
@@ -74,14 +73,6 @@ const app = async (fastify, opts) => {
                         bearerFormat: 'JWT',
                     },
                 },
-            },
-        },
-    });
-    fastify.register(fastify_api_reference_1.default, {
-        routePrefix: '/api/documentation',
-        configuration: {
-            spec: {
-                content: () => fastify.swagger(),
             },
         },
     });

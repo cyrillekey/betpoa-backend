@@ -1,8 +1,9 @@
-import { configs } from '@configs/index'
 import africastalking from 'africastalking'
 import axios, { AxiosRequestConfig } from 'axios'
 import { FastifyInstance } from 'fastify'
 import fp from 'fastify-plugin'
+
+import { configs } from '../configs'
 interface ICommunication {
   sendSms(phone: string, message: string): Promise<boolean>
 }

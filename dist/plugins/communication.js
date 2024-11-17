@@ -3,18 +3,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("@configs/index");
+const configs_1 = require("../configs");
 const africastalking_1 = __importDefault(require("africastalking"));
 const axios_1 = __importDefault(require("axios"));
 const fastify_plugin_1 = __importDefault(require("fastify-plugin"));
 const sendSmsAfrikasTalking = async (fastify, phone, message) => {
-    const atClient = (0, africastalking_1.default)({ apiKey: index_1.configs.afrikasTalking.apiKey, username: index_1.configs.afrikasTalking.username });
+    const atClient = (0, africastalking_1.default)({ apiKey: configs_1.configs.afrikasTalking.apiKey, username: configs_1.configs.afrikasTalking.username });
     const smsClient = atClient.SMS;
     try {
         const response = await smsClient.send({
             to: [fastify.helpers.formatPhoneNumber(phone)],
             message,
-            from: index_1.configs.afrikasTalking.senderId,
+            from: configs_1.configs.afrikasTalking.senderId,
         });
         if (!response)
             return false;
@@ -31,8 +31,8 @@ const sendSmsLeopardSms = async (fastify, phone, message) => {
             method: 'POST',
             url: 'https://api.smsleopard.com/v1/sms/send',
             auth: {
-                username: index_1.configs.smsLeopard.apiKey,
-                password: index_1.configs.smsLeopard.apiSecret,
+                username: configs_1.configs.smsLeopard.apiKey,
+                password: configs_1.configs.smsLeopard.apiSecret,
             },
             data: {
                 source: 'sms_test',
@@ -63,7 +63,7 @@ const sendSmsLeopardSms = async (fastify, phone, message) => {
 exports.default = (0, fastify_plugin_1.default)(async (fastify) => {
     const sendSms = async (phone, message) => {
         try {
-            switch (index_1.configs.smsPlatform) {
+            switch (configs_1.configs.smsPlatform) {
                 case 'smsleopard': {
                     const response = await sendSmsAfrikasTalking(fastify, phone, message);
                     return response;
