@@ -9,7 +9,6 @@ const autoload_1 = __importDefault(require("@fastify/autoload"));
 const cors_1 = __importDefault(require("@fastify/cors"));
 const swagger_1 = __importDefault(require("@fastify/swagger"));
 const fastify_sentry_1 = __importDefault(require("@immobiliarelabs/fastify-sentry"));
-const profiling_node_1 = require("@sentry/profiling-node");
 const path_1 = require("path");
 const configs_1 = require("./configs");
 const options = {};
@@ -18,7 +17,6 @@ const app = async (fastify, opts) => {
     fastify.withTypeProvider();
     fastify.register(fastify_sentry_1.default, {
         dsn: 'https://921097d6a76bab89051f3a2d7433fa20@o4507057833902080.ingest.us.sentry.io/4507057837506560',
-        integrations: [(0, profiling_node_1.nodeProfilingIntegration)()],
         enabled: process.env.NODE_ENV == 'production' || process.env.NODE_ENV == 'staging',
         tracesSampleRate: 0.3,
         enableTracing: true,

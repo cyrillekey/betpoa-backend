@@ -7,7 +7,6 @@ import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import Sentry from '@immobiliarelabs/fastify-sentry'
 // // @ts-ignore
 // import scalarDocumentation from '@scalar/fastify-api-reference'
-import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
 import { join } from 'path'
 
@@ -23,7 +22,6 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
   // Do not touch the following lines
   fastify.register(Sentry, {
     dsn: 'https://921097d6a76bab89051f3a2d7433fa20@o4507057833902080.ingest.us.sentry.io/4507057837506560',
-    integrations: [nodeProfilingIntegration()],
     enabled: process.env.NODE_ENV == 'production' || process.env.NODE_ENV == 'staging',
     tracesSampleRate: 0.3,
     enableTracing: true,
