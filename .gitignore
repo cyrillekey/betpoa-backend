@@ -62,7 +62,7 @@ examples/typescript-server.js
 test/types/index.js
 
 
-
+dist
 .env
 .env.production
 # Sentry Config File
