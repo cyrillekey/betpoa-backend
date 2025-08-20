@@ -6,7 +6,7 @@ import swagger from '@fastify/swagger'
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import Sentry from '@immobiliarelabs/fastify-sentry'
 // // @ts-ignore
-// import scalarDocumentation from '@scalar/fastify-api-reference'
+import scalarDocumentation from '@scalar/fastify-api-reference'
 import { FastifyPluginAsync, FastifyServerOptions } from 'fastify'
 import { join } from 'path'
 
@@ -63,6 +63,10 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
           name: 'Admin',
           description: `Administrative endpoints for managing the system,users,bets and all administrative task associated with ${configs.appname}`,
         },
+        {
+          name: 'Blog',
+          description: 'Get all sports blogs',
+        },
       ],
       servers: [
         {
@@ -81,14 +85,14 @@ const app: FastifyPluginAsync<AppOptions> = async (fastify, opts): Promise<void>
       },
     },
   })
-  // fastify.register(scalarDocumentation, {
-  //   routePrefix: '/api/documentation',
-  //   configuration: {
-  //     spec: {
-  //       content: () => fastify.swagger(),
-  //     },
-  //   },
-  // })
+  fastify.register(scalarDocumentation, {
+    routePrefix: '/api/documentation',
+    configuration: {
+      spec: {
+        content: () => fastify.swagger(),
+      },
+    },
+  })
   // This loads all plugins defined in plugins
   // those should be support plugins that are reused
   // through your application

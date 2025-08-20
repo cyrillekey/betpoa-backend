@@ -9,9 +9,9 @@ export const getLeagues = async (): Promise<ILeague[]> => {
   try {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: 'https://api-football-v1.p.rapidapi.com/v3/leagues',
+      url: 'https://sport-highlights-api.p.rapidapi.com/football/leagues',
       params: {
-        current: true,
+        season: 2025,
       },
       headers: {
         'X-RapidAPI-Key': configs.rapidApiKey,
@@ -19,8 +19,11 @@ export const getLeagues = async (): Promise<ILeague[]> => {
       },
     }
     const response = await axios(config)
-      .then((resp) => resp?.data?.response)
-      .catch(() => [])
+      .then((resp) => resp?.data?.data)
+      .catch((err) => {
+        console.log(err)
+        return []
+      })
 
     return response
   } catch (error) {
@@ -31,7 +34,7 @@ export async function getUpcomingFixtures(date: Date): Promise<IFixture[]> {
   try {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: 'https://api-football-v1.p.rapidapi.com/v3/fixtures',
+      url: 'https://sport-highlights-api.p.rapidapi.com/football/matches',
       headers: {
         'X-RapidAPI-Key': configs.rapidApiKey,
         'X-RapidAPI-Host': configs.rapidApiHost,
@@ -42,7 +45,7 @@ export async function getUpcomingFixtures(date: Date): Promise<IFixture[]> {
     }
     const response = await axios(config)
       .then((resp) => {
-        return resp?.data?.response
+        return resp?.data?.data
       })
       .catch(() => [])
     return response
@@ -54,7 +57,7 @@ export async function getFixtures(fixturesId: string[]): Promise<IFixture[]> {
   try {
     const config: AxiosRequestConfig = {
       method: 'GET',
-      url: 'https://api-football-v1.p.rapidapi.com/v3/fixtures',
+      url: 'https://sport-highlights-api.p.rapidapi.com/football/matches',
       headers: {
         'X-RapidAPI-Key': configs.rapidApiKey,
         'X-RapidAPI-Host': configs.rapidApiHost,
@@ -64,7 +67,7 @@ export async function getFixtures(fixturesId: string[]): Promise<IFixture[]> {
       },
     }
     const response = await axios(config)
-      .then((resp) => resp?.data?.response)
+      .then((resp) => resp?.data?.data)
       .catch(() => [])
     return response
   } catch (error) {

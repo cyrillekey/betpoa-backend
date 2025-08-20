@@ -1,38 +1,25 @@
 export interface ILeague {
-  league: League
+  id: number
+  logo: string
+  name: string
   country: Country
-  seasons: Season[]
+  season: number | Record<String, any>
 }
 
 export interface Country {
+  code: string
   name: string
-  code: null
-  flag: null
-}
-
-export interface League {
-  id: number
-  name: string
-  type: string
   logo: string
 }
 
-export interface Season {
-  year: number
-  start: Date
-  end: Date
-  current: boolean
-}
 export interface IFixture {
-  fixture: Fixture
-  league: League
-  teams: TeamsClass
-  goals: TeamsClass
-  score: Score
-  events: Event[]
-  lineups: Lineup[]
-  statistics: IFixtureStatistic[]
-  players: IFixturePlayer[]
+  id: number
+  round: string
+  date: string
+  country: Country
+  awayTeam: Team
+  homeTeam: Team
+  league: ILeague
 }
 
 export interface Event {

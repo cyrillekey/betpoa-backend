@@ -23,12 +23,12 @@ export const createLeaguesCronjob = async (app: FastifyInstance) => {
     await app.prisma.league.createMany({
       data: leagues.map((a) => ({
         country: a?.country?.name,
-        leagueId: a?.league?.id,
-        logo: a?.league?.logo,
-        name: a?.league?.name,
-        type: a?.league?.type,
-        season: a?.seasons?.at(0)?.year?.toString() ?? '',
-        id: a?.league?.id,
+        leagueId: a?.id,
+        logo: a?.logo,
+        name: a?.name,
+        type: 'League',
+        season: '2025',
+        id: a.id,
       })),
       skipDuplicates: true,
     })

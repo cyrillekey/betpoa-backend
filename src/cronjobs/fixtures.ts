@@ -1,4 +1,3 @@
-import { MATCHSTATUS } from '@prisma/client'
 import { getUpcomingFixtures } from '@rapidapi/index'
 import dayjs from 'dayjs'
 import { FastifyInstance } from 'fastify'
@@ -32,17 +31,16 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
           data: leagues.map((a) => ({
             country: a?.name,
             leagueId: a?.id,
-            logo: a?.logo,
+            logo: a?.logo ?? 'https://res.cloudinary.com/ddia14anf/image/upload/v1755687520/football_lqmdwv.png',
             name: a?.name,
-            type: a?.type ?? a?.name,
-            season: new Date().getFullYear().toString(),
-            id: a?.id,
+            type: 'League',
+            id: a.id,
+            season: a.season.toString(),
           })),
         })
         const allTeams = fixtures
           .map((a) => {
-            if (a?.teams?.home && a?.teams?.away) return [a?.teams?.away, a?.teams.home]
-            return []
+            return [a?.homeTeam, a.awayTeam]
           })
           .flat()
 
@@ -54,7 +52,7 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
           data: teams?.map((a) => ({
             teamId: a!.id,
             code: a!.name,
-            logo: a!.logo,
+            logo: a?.logo ?? 'https://res.cloudinary.com/ddia14anf/image/upload/v1755687520/football_lqmdwv.png',
             name: a!.name,
             venue: '',
             id: a?.id,
@@ -62,72 +60,18 @@ export const getUpcomingFixturesCronjobs = async (app: FastifyInstance) => {
         })
         await app.prisma.fixture.createMany({
           skipDuplicates: true,
-          data: fixtures
-            .filter((a) => a?.teams?.away && a?.teams?.home)
-            .map((a) => ({
-              fixtureId: a?.fixture?.id,
-              awayTeamId: a?.teams?.away?.id,
-              homeTeamId: a?.teams?.home?.id,
-              date: a?.fixture?.date,
-              leagueId: a?.league?.id,
-              referee: a?.fixture?.referee ?? 'N/A',
-              shortStatus: a?.fixture?.status?.short,
-              status: getFixtureStatus(a!.fixture!.status!.short!),
-            })),
+          data: fixtures.map((a) => ({
+            fixtureId: a?.id,
+            awayTeamId: a.awayTeam.id,
+            homeTeamId: a.homeTeam.id,
+            date: a?.date,
+            leagueId: a?.league?.id,
+            referee: 'N/A',
+            shortStatus: '',
+            status: 'UPCOMMING',
+          })),
         })
-        const fixturesTransaction: any[] = []
-        const fixturesToCreate = fixtures.filter((a) => a?.teams?.away && a?.teams?.home)
-        for (let index = 0; index < fixturesToCreate.length; index++) {
-          const fixture = fixturesToCreate[index]
-          const fixtureResult = await app.prisma.fixtureResult
-            .findFirstOrThrow({
-              where: {
-                fixture: {
-                  fixtureId: fixture?.fixture?.id,
-                },
-              },
-            })
-            .then((resp) => resp?.id)
-            .catch(() => null)
-          if (fixtureResult == null) {
-            fixturesTransaction.push(
-              app.prisma.fixtureResult.create({
-                data: {
-                  awayGoals: fixture?.score?.fulltime?.away,
-                  homeGoals: fixture?.score?.fulltime?.home,
-                  htAwayGoals: fixture?.score?.halftime?.away,
-                  htHomeGoals: fixture?.score?.halftime?.home,
-                  extraAwayGoals: fixture?.score?.extratime?.away ?? undefined,
-                  extraHomeGoals: fixture?.score?.extratime?.home ?? undefined,
-                  fixture: {
-                    connect: {
-                      fixtureId: fixture?.fixture?.id,
-                    },
-                  },
-                },
-              }),
-            )
-          } else {
-            console.log(fixtureResult)
-            fixturesTransaction.push(
-              app.prisma.fixtureResult.update({
-                where: {
-                  id: fixtureResult!,
-                },
-                data: {
-                  awayGoals: fixture?.score?.fulltime?.away,
-                  homeGoals: fixture?.score?.fulltime?.home,
-                  htAwayGoals: fixture?.score?.halftime?.away,
-                  htHomeGoals: fixture?.score?.halftime?.home,
-                  extraAwayGoals: fixture?.score?.extratime?.away,
-                  extraHomeGoals: fixture?.score?.extratime?.home,
-                },
-              }),
-            )
-          }
-        }
 
-        await app.prisma.$transaction(fixturesTransaction)
         app.log.info(`Genetating fixtures for ${dayjs().add(index, 'day').toDate()}`)
       } catch (error) {
         app.Sentry.captureException(error)
@@ -176,75 +120,75 @@ export const getFixturesResults = async (app: FastifyInstance) => {
   }
 }
 
-const getFixtureStatus = (status: string): MATCHSTATUS => {
-  switch (status) {
-    case 'TBD':
-    case 'NS':
-      return 'UPCOMMING'
-    case '1H':
-    case 'HT':
-    case '2H':
-    case 'ET':
-    case 'BT':
-    case 'P':
-    case 'INT':
-    case 'LIVE':
-      return 'INPLAY'
-    case 'FT':
-    case 'AET':
-    case 'PEN':
-      return 'FINISHED'
-    case 'SUSP':
-    case 'PST':
-    case 'CANC':
-    case 'ABD':
-    case 'WO':
-    case 'AWD':
-      return 'ABANDONED'
-    default:
-      return 'CANCELLED'
-  }
-}
-async function generateResults(app: FastifyInstance, date: Date) {
-  const resultsToday = await getUpcomingFixtures(date)
-  const fixtureIds = resultsToday.map((a) => a?.fixture?.id)
-  const results = await app.prisma.fixtureResult.findMany({
-    where: {
-      fixture: {
-        fixtureId: {
-          in: fixtureIds,
-        },
-      },
-    },
-    select: {
-      fixture: {
-        select: {
-          fixtureId: true,
-          id: true,
-        },
-      },
-    },
-  })
-  for (let index = 0; index < results.length; index++) {
-    const result = resultsToday.find((a) => a?.fixture?.id == results[index]?.fixture?.fixtureId)
-    await app.prisma.fixtureResult.update({
-      where: {
-        fixtureId: results[index]?.fixture?.id,
-      },
-      data: {
-        awayGoals: result?.score?.fulltime?.away,
-        homeGoals: result?.score?.fulltime?.home,
-        extraAwayGoals: result?.score?.extratime?.away,
-        extraHomeGoals: result?.score?.extratime?.home,
-        htAwayGoals: result?.score?.halftime?.away,
-        htHomeGoals: result?.score?.halftime?.home,
-        fixture: {
-          update: {
-            status: getFixtureStatus(result?.fixture?.status?.short ?? 'NP'),
-            shortStatus: result?.fixture?.status?.short,
-          },
-        },
-      },
-    })
-  }
+// const getFixtureStatus = (status: string): MATCHSTATUS => {
+//   switch (status) {
+//     case 'TBD':
+//     case 'NS':
+//       return 'UPCOMMING'
+//     case '1H':
+//     case 'HT':
+//     case '2H':
+//     case 'ET':
+//     case 'BT':
+//     case 'P':
+//     case 'INT':
+//     case 'LIVE':
+//       return 'INPLAY'
+//     case 'FT':
+//     case 'AET':
+//     case 'PEN':
+//       return 'FINISHED'
+//     case 'SUSP':
+//     case 'PST':
+//     case 'CANC':
+//     case 'ABD':
+//     case 'WO':
+//     case 'AWD':
+//       return 'ABANDONED'
+//     default:
+//       return 'CANCELLED'
+//   }
+// }
+async function generateResults(_app: FastifyInstance, _date: Date) {
+  // const resultsToday = await getUpcomingFixtures(date)
+  // const fixtureIds = resultsToday.map((a) => a?.fixture?.id)
+  // const results = await app.prisma.fixtureResult.findMany({
+  //   where: {
+  //     fixture: {
+  //       fixtureId: {
+  //         in: fixtureIds,
+  //       },
+  //     },
+  //   },
+  //   select: {
+  //     fixture: {
+  //       select: {
+  //         fixtureId: true,
+  //         id: true,
+  //       },
+  //     },
+  //   },
+  // })
+  // for (let index = 0; index < results.length; index++) {
+  //   const result = resultsToday.find((a) => a?.fixture?.id == results[index]?.fixture?.fixtureId)
+  //   await app.prisma.fixtureResult.update({
+  //     where: {
+  //       fixtureId: results[index]?.fixture?.id,
+  //     },
+  //     data: {
+  //       awayGoals: result?.score?.fulltime?.away,
+  //       homeGoals: result?.score?.fulltime?.home,
+  //       extraAwayGoals: result?.score?.extratime?.away,
+  //       extraHomeGoals: result?.score?.extratime?.home,
+  //       htAwayGoals: result?.score?.halftime?.away,
+  //       htHomeGoals: result?.score?.halftime?.home,
+  //       fixture: {
+  //         update: {
+  //           status: getFixtureStatus(result?.fixture?.status?.short ?? 'NP'),
+  //           shortStatus: result?.fixture?.status?.short,
+  //         },
+  //       },
+  //     },
+  //   })
+  // }
 }
